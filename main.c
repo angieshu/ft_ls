@@ -1,25 +1,19 @@
-#include <sys/types.h>
-#include <sys/xattr.h>
-#include <sys/types.h>
-#include <sys/acl.h>
-#include <stdio.h>
+#include "ft_ls.h" 
 
-void	opt_set(s_opt *opt)
+void	opt_reset(t_opt *opt)
 {
 	opt->l = 0;
 	opt->rr = 0;
 	opt->a = 0;
 	opt->r = 0;
 	opt->t = 0;
+	opt->none = 1;
 }
 
-int		option(char *s, s_opt *opt)
+int		option(char *s, t_opt *opt)
 {
-	opt_set(opt);
-
-	if (!(++s))
-		return (1);
-	while (s)
+	opt->none = (!*(++s)) ? 1 : 0;
+	while (*s)
 	{
 		if (*s == 'l')
 			opt->l = 1;
@@ -31,48 +25,61 @@ int		option(char *s, s_opt *opt)
 			opt->r = 1;
 		else if (*s == 't')
 			opt->t = 1;
+		else if (*s == '-' && opt->none != 1)
+			opt->none = 1;
 		else
 		{
 			printf("./ft_ls: illigal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
 			return (0);
 		}
-		s++;
+		++s;
 	}
 	return (1);
 }
 
-// void	current_dir(s_opt *opt)
-// {
-// 	int		id;
-// 	DIR		*dir;
-// 	char	*d;
+void	apply_opt(char *d, t_opt *opt)
+{
+	DIR		*dir;
+	struct dirent *d_dir;
 
-// 	id = getuid();
-// 	d = getpwuid(id)->pw_dir;
-// 	dir = opendir(d);
-// 	apply_opt()	
-// }
+	dir = opendir(d);
+	while ((d_dir = readdir(dir)))
+		printf("%s\n", d_dir->d_name);
+	closedir(dir);
+}
 
-// void	directory(int ac, char **av, s_opt *opt, int i)
-// {
-// 	if (i == ac - 1)
-// 		current_dir(opt);
-// }
+void	current_dir(t_opt *opt)
+{
+	// int		id;
+	// DIR		*dir;
+	char	*d;
+	// id = getuid();
+	// d = getpwuid(id)->pw_dir;
+	d = getenv("PWD");
+	apply_opt(d, opt);	
+}
+
+void	check_directory(int ac, char **av, t_opt *opt, int i)
+{
+	if (i == ac)
+		current_dir(opt);
+}
 
 int		main(int ac, char **av)
 {
 	int i;
-	struct s_opt opt;
+	t_opt opt;
 
 	i = 1;
+	opt_reset(&opt);
 	if (*av[1] == '-')
 	{
-		if (!option(av[1]), &opt)
+		if (!option(av[1], &opt))
 			return (0);
 		i++;
 	}
-	// directory(ac, av, &opt, i);
+	check_directory(ac, av, &opt, i);
 }
 // int main (int ac, char **av) {
 //     acl_t acl = NULL;

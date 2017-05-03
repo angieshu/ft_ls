@@ -8,16 +8,18 @@
 # include <sys/types.h>
 # include <pwd.h>
 # include <uuid/uuid.h>
+# include <sys/xattr.h>
 # include <grp.h>
-# include <uuid/uuid.h>
 # include <stdio.h>
+# include <stdlib.h>
 
-struct	s_opt
+typedef struct	s_opt
 {
 	int l;
 	int rr;
 	int a;
 	int r;
 	int t;
-}		t_opt;
+	int none;
+}				t_opt;
 #endif
