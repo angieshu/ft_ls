@@ -38,15 +38,35 @@ int		option(char *s, t_opt *opt)
 	return (1);
 }
 
+void	print_list(t_list **dir_list)
+{
+	while (*dir_list)
+	{
+		printf("%s\n", (*dir_list)->content);
+		(*dir_list) = (*dir_list)->next;
+	}
+}
+
 void	apply_opt(char *d, t_opt *opt)
 {
 	DIR		*dir;
 	struct dirent *d_dir;
+	t_list *dir_list;
+	t_list *dir_tmp;
 
 	dir = opendir(d);
+	if (!(d_dir = readdir(dir)))
+		return ;
+	dir_list = ft_lstnew(d_dir->d_name, d_dir->d_namlen);
 	while ((d_dir = readdir(dir)))
-		printf("%s\n", d_dir->d_name);
+	{
+		dir_tmp = ft_lstnew(d_dir->d_name, d_dir->d_namlen);
+		ft_lstadd(&dir_list, dir_tmp);
+		// printf("%s\n", dir_list->content);
+		free(dir_tmp);
+	}
 	closedir(dir);
+	print_list(&dir_list);		
 }
 
 void	current_dir(t_opt *opt)
@@ -64,6 +84,11 @@ void	check_directory(int ac, char **av, t_opt *opt, int i)
 {
 	if (i == ac)
 		current_dir(opt);
+	else
+	{
+		while (i < ac)
+			apply_opt(av[i++], opt);
+	}
 }
 
 int		main(int ac, char **av)
@@ -73,7 +98,7 @@ int		main(int ac, char **av)
 
 	i = 1;
 	opt_reset(&opt);
-	if (*av[1] == '-')
+	if (ac > 1 && av[1][0] == '-')
 	{
 		if (!option(av[1], &opt))
 			return (0);
