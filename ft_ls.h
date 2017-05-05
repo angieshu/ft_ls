@@ -12,6 +12,7 @@
 # include <grp.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <errno.h>
 
 typedef struct	s_opt
 {
@@ -31,5 +32,6 @@ typedef	struct	s_dlist
 
 t_dlist		*sort_dir(t_dlist *head, t_opt *opt);
 t_dlist		*merge_list(t_dlist *a, t_dlist *b, t_opt *opt);
+void		print_list(char *d, t_opt *opt);
 
 #endif
