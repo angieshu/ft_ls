@@ -22,4 +22,14 @@ typedef struct	s_opt
 	int t;
 	int none;
 }				t_opt;
+
+typedef	struct	s_dlist
+{
+	char			*name;
+	struct s_dlist	*next;
+}				t_dlist;
+
+t_dlist		*sort_dir(t_dlist *head, t_opt *opt);
+t_dlist		*merge_list(t_dlist *a, t_dlist *b, t_opt *opt);
+
 #endif

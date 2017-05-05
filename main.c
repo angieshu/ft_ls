@@ -38,56 +38,56 @@ int		option(char *s, t_opt *opt)
 	return (1);
 }
 
-void	print_list(t_list **dir_list)
+t_dlist	*read_dir(char *d, t_opt *opt)
 {
-	while (*dir_list)
-	{
-		printf("%s\n", (*dir_list)->content);
-		(*dir_list) = (*dir_list)->next;
-	}
-}
-
-void	apply_opt(char *d, t_opt *opt)
-{
-	DIR		*dir;
-	struct dirent *d_dir;
-	t_list *dir_list;
-	t_list *dir_tmp;
+	struct dirent	*d_dir;
+	t_dlist			*dir_list;
+	t_dlist			*dir_tmp;
+	DIR				*dir;
 
 	dir = opendir(d);
 	if (!(d_dir = readdir(dir)))
-		return ;
-	dir_list = ft_lstnew(d_dir->d_name, d_dir->d_namlen);
+		return (NULL);
+	dir_list = (t_dlist*)ft_memalloc(sizeof(t_dlist));
+	dir_list->name = d_dir->d_name;
+	dir_list->next = NULL;
 	while ((d_dir = readdir(dir)))
 	{
-		dir_tmp = ft_lstnew(d_dir->d_name, d_dir->d_namlen);
-		ft_lstadd(&dir_list, dir_tmp);
-		// printf("%s\n", dir_list->content);
-		free(dir_tmp);
+		dir_tmp = (t_dlist*)ft_memalloc(sizeof(t_dlist));
+		dir_tmp->name = d_dir->d_name;
+		dir_tmp->next = dir_list;
+		dir_list = dir_tmp;
 	}
+	// if (dir_tmp)
+	// 	free(dir_tmp);
 	closedir(dir);
-	print_list(&dir_list);		
+	return (sort_dir(dir_list, opt));
 }
 
-void	current_dir(t_opt *opt)
+void	print_list(char *d, t_opt *opt)
 {
-	// int		id;
-	// DIR		*dir;
-	char	*d;
-	// id = getuid();
-	// d = getpwuid(id)->pw_dir;
-	d = getenv("PWD");
-	apply_opt(d, opt);	
+	t_dlist *list;
+
+	if (!(list = read_dir(d, opt)))
+		return ;
+	while (list)
+	{
+		printf("%s\n", list->name);
+		list = list->next;
+	}
+	free(list);
 }
 
 void	check_directory(int ac, char **av, t_opt *opt, int i)
 {
 	if (i == ac)
-		current_dir(opt);
+		print_list(getenv("PWD"), opt);
+		// read_dir(getenv("PWD"), opt);
 	else
 	{
 		while (i < ac)
-			apply_opt(av[i++], opt);
+			print_list(av[i++], opt);
+			// read_dir(av[i++], opt);
 	}
 }
 
