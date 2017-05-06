@@ -5,6 +5,7 @@
 # include <dirent.h>
 # include <unistd.h>
 # include <sys/stat.h>
+# include <sys/dir.h>
 # include <sys/types.h>
 # include <pwd.h>
 # include <uuid/uuid.h>
@@ -14,7 +15,7 @@
 # include <stdlib.h>
 # include <errno.h>
 
-typedef struct	s_opt
+typedef struct		s_opt
 {
 	int l;
 	int rr;
@@ -22,16 +23,20 @@ typedef struct	s_opt
 	int r;
 	int t;
 	int none;
-}				t_opt;
+}					t_opt;
 
-typedef	struct	s_dlist
-{
-	char			*name;
-	struct s_dlist	*next;
-}				t_dlist;
+// typedef	struct		s_dlist
+// {
+// 	char			*name;
+// 	struct s_dlist	*next;
+// }					t_dlist;
 
-t_dlist		*sort_dir(t_dlist *head, t_opt *opt);
-t_dlist		*merge_list(t_dlist *a, t_dlist *b, t_opt *opt);
+t_list		*sort_dir(t_list *head, t_opt *opt);
+t_list		*merge_list(t_list *a, t_list *b, t_opt *opt);
+
+// t_dlist		*list_new(char *name);
+int			list_add(t_list **head, char *name, size_t size);
 void		print_list(char *d, t_opt *opt);
+void		path(char *path_name, char *curr_dir, char *file_name);
 
 #endif

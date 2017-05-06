@@ -12,18 +12,18 @@
 
 #include "ft_ls.h" 
 
-t_dlist		*merge_list(t_dlist *a, t_dlist *b, t_opt *opt)
+t_list		*merge_list(t_list *a, t_list *b, t_opt *opt)
 {
-	t_dlist tmp;
-	t_dlist *head;
-	t_dlist *c;
+	t_list tmp;
+	t_list *head;
+	t_list *c;
 	int k;
 
 	head = &tmp;
 	c = head;
 	while (a && b)
 	{
-		k = ft_strcmp(a->name, b->name);
+		k = ft_strcmp(a->content, b->content);
 		if ((k < 0 && opt->r != 1) || (k > 0 && opt->r == 1))
 		{
 			c->next = a;
@@ -41,10 +41,10 @@ t_dlist		*merge_list(t_dlist *a, t_dlist *b, t_opt *opt)
 	return (head->next);
 }
 
-t_dlist		*sort_dir(t_dlist *head, t_opt *opt)
+t_list		*sort_dir(t_list *head, t_opt *opt)
 {
-	t_dlist *a;
-	t_dlist *b;
+	t_list *a;
+	t_list *b;
 
 	if (!head || !head->next)
 		return (head);

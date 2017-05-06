@@ -12,6 +12,8 @@ void	opt_reset(t_opt *opt)
 
 int		option(char *s, t_opt *opt)
 {
+	if (!ft_strcmp("--", s))
+		return (1);
 	opt->none = (!*(++s)) ? 1 : 0;
 	while (*s)
 	{
@@ -25,11 +27,9 @@ int		option(char *s, t_opt *opt)
 			opt->r = 1;
 		else if (*s == 't')
 			opt->t = 1;
-		else if (*s == '-' && opt->none != 1)
-			opt->none = 1;
 		else
 		{
-			printf("./ft_ls: illigal option -- %c\n", *s);
+			printf("./ft_ls: illegal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
 			return (0);
 		}
@@ -38,112 +38,95 @@ int		option(char *s, t_opt *opt)
 	return (1);
 }
 
-t_dlist	*read_dir(char *d, t_opt *opt)
+t_list	*read_dir(char *d, t_opt *opt)
 {
 	struct dirent	*d_dir;
-	t_dlist			*dir_list;
-	t_dlist			*dir_tmp;
+	t_list			*dir_list;
 	DIR				*dir;
 
-	dir = opendir(d);
-	if (!(d_dir = readdir(dir)))
+	dir_list = NULL;
+	if (!(dir = opendir(d)))
 		return (NULL);
-	dir_list = (t_dlist*)ft_memalloc(sizeof(t_dlist));
-	dir_list->name = d_dir->d_name;
-	dir_list->next = NULL;
 	while ((d_dir = readdir(dir)))
 	{
-		dir_tmp = (t_dlist*)ft_memalloc(sizeof(t_dlist));
-		if (!(dir_tmp->name = d_dir->d_name))
-			break ;
-		dir_tmp->next = dir_list;
-		dir_list = dir_tmp;
+		if (!(d_dir->d_name[0] == '.' && opt->a != 1))
+			if (!list_add(&dir_list, d_dir->d_name, d_dir->d_namlen))
+				return (NULL);
 	}
-	// if (dir_tmp)
-	// 	free(dir_tmp);
 	closedir(dir);
 	return (sort_dir(dir_list, opt));
 }
 
-void	view_dir(char *d, t_opt *opt)
+t_list	*view_dir(char *d, t_opt *opt)
 {
 	DIR *dir;
 	struct dirent *entry;
 	struct stat i_entry;
 	char path_name[PATH_MAX + 1];
+	t_list *list;
 	
+	list = NULL;
 	dir = opendir(d);
 	while ((entry = readdir(dir)))
 	{
 		if (ft_strncmp(entry->d_name, ".", PATH_MAX) &&
-			ft_strncmp(entry->d_name, "..", PATH_MAX))
+			ft_strncmp(entry->d_name, "..", PATH_MAX) &&
+			(!(entry->d_name[0] == '.' && opt->a != 1)))
 		{
-			ft_strncpy(path_name, d, PATH_MAX);
-			ft_strncat(path_name, "/", PATH_MAX);
-			ft_strncat(path_name, entry->d_name, PATH_MAX);
+			path(path_name, d, entry->d_name);
 			stat(path_name, &i_entry);
 			if (S_ISDIR(i_entry.st_mode))
-			{
-				printf("\n%s:\n", path_name);
-				print_list(path_name, opt);
-			}
+				if (!list_add(&list, path_name, ft_strlen(path_name)))
+					return (NULL);
 		}
 	}
 	closedir(dir);
+	return (sort_dir(list, opt));
 }
 
-// void	apply_opt(char *d, t_dlist **list, t_opt *opt)
-// {
-// 	struct dirent *d_dir;
-// 	t_dlist *dir_list;
-// 	DIR *dir;
+void	path(char *path_name, char *curr_dir, char *file_name)
+{
+	ft_strncpy(path_name, curr_dir, PATH_MAX);
+	ft_strncat(path_name, "/", PATH_MAX);
+	ft_strncat(path_name, file_name, PATH_MAX);
+}
 
-// 	if (opt->R == 1)
-// 	{
-// 		dir = opendir(d);
-// 		while ((d_dir = readdir(dir)))
-// 			if ()
-// 	}
-// }
+void	print_dir(char *curr_dir, t_opt *opt)
+{
+	t_list	*list;
+
+	if (!(list = view_dir(curr_dir, opt)))
+		return ;
+	while (list)
+	{
+		printf("\n%s:\n", list->content);
+		print_list(list->content, opt);
+		list = list->next;
+	}
+	free(list);
+}
 
 void	print_list(char *d, t_opt *opt)
 {
-	t_dlist *list;
+	t_list *list;
 
 	if (!(list = read_dir(d, opt)))
 		return ;
 	// apply_opt(d, &list, opt);
 	while (list)
 	{
-		if (list->name[0] != '.' || (list->name[0] == '.' && opt->a == 1))
-			printf("%s\n", list->name);
+		printf("%s\n", list->content);
 		list = list->next;
 	}
 	free(list);
 	if (opt->rr == 1)
-		view_dir(d, opt);
-	// if (opt->rr == 1)
-	// {
-	// 	dir = opendir(d);
-	// 	while ((d_dir = readdir(dir)))
-	// 	{
-	// 		printf("========%s\n", d_dir->d_name);
-	// 		if (d_dir->d_type == 4)
-	// 		{
-	// 			tmp = ft_strjoin(d, "/");
-	// 			s = ft_strjoin(tmp, d_dir->d_name);
-	// 			// free (tmp);
-	// 			print_list(s, opt);
-	// 			// free (s);
-	// 		}
-	// 	}
-	// }
+		print_dir(d, opt);
 }
 
 void	check_directory(int ac, char **av, t_opt *opt, int i)
 {
 	if (i == ac)
-		print_list(getenv("PWD"), opt);
+		print_list(".", opt);
 		// read_dir(getenv("PWD"), opt);
 	else
 	{
