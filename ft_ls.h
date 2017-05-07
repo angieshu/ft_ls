@@ -14,6 +14,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <errno.h>
+# include <time.h>
 
 typedef struct		s_opt
 {
@@ -22,6 +23,7 @@ typedef struct		s_opt
 	int a;
 	int r;
 	int t;
+	int tt;
 	int none;
 }					t_opt;
 

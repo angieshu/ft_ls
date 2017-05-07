@@ -7,6 +7,7 @@ void	opt_reset(t_opt *opt)
 	opt->a = 0;
 	opt->r = 0;
 	opt->t = 0;
+	opt->tt = 0;
 	opt->none = 1;
 }
 
@@ -17,7 +18,7 @@ int		option(char *s, t_opt *opt)
 	opt->none = (!*(++s)) ? 1 : 0;
 	while (*s)
 	{
-		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't')
+		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't' && *s != 'T')
 		{
 			printf("./ft_ls: illegal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
@@ -28,23 +29,49 @@ int		option(char *s, t_opt *opt)
 		opt->t = (*s == 't') ? 1 : opt->t;
 		opt->a = (*s == 'a') ? 1 : opt->a;
 		opt->rr = (*s == 'R') ? 1 : opt->rr;
+		opt->tt = (*s == 'T') ? 1 : opt->tt;
 		++s;
 	}
 	return (1);
 }
 
+char	*time_s(char **time, t_opt *opt)
+{
+	char *s;
+	int i;
+	int n;
+
+	i = 0;
+	n = 0;
+	s = (opt->tt == 1) ? ft_strnew(20) : ft_strnew(17);
+	while (**time != ' ')
+		(*time)++;
+	(*time)++;
+	while (**time != '\n')
+	{
+		n += (**time == ':') ? 1 : 0;
+		if (**time == ':' && n > 0 && opt->tt != 1)
+			(*time) += 3;
+		s[i++] = **time;
+		(*time)++;
+	}
+	return (s);
+}
+
 void	apply_opt(t_list *dir_list, char *dir, t_opt *opt)
 {
 	struct stat		i_entry;
-	struct tm time; 
-	char path_name[PATH_MAX + 1];
+	char name[PATH_MAX + 1];
+	char *time;
+
+	if (opt->l != 1)
+		return ; 
 	while (dir_list && !opt->none && (opt->l || opt->t))
 	{
-		lstat(path(path_name, dir, dir_list->content), &i_entry);
-		if (opt->t == 1)
-			dir_list->content_size = i_entry.st_mtime;
-		if (opt->l == 1)
-			printf("%u\n", i_entry.st_uid);
+		lstat(path(name, dir, dir_list->content), &i_entry);
+		time = ctime(&i_entry.st_mtime);
+		printf("%s\n", time_s(&time, opt));
+			// printf("%s\n", ctime(&i_entry.st_mtime));
 		dir_list = dir_list->next;
 	}
 }
@@ -52,6 +79,8 @@ void	apply_opt(t_list *dir_list, char *dir, t_opt *opt)
 t_list	*read_dir(char *d, t_opt *opt)
 {
 	struct dirent	*d_dir;
+	struct stat		i_entry;
+	char name[PATH_MAX + 1];
 	t_list			*dir_list;
 	DIR				*dir;
 
@@ -65,6 +94,11 @@ t_list	*read_dir(char *d, t_opt *opt)
 		{
 			if (!list_add(&dir_list, d_dir->d_name, d_dir->d_namlen))
 				return (NULL);
+			if (opt->t == 1)
+			{
+				lstat(path(name, d, dir_list->content), &i_entry);
+				dir_list->content_size = i_entry.st_mtime;
+			}
 		}
 	}
 	closedir(dir);
