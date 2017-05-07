@@ -30,13 +30,12 @@ typedef struct		s_opt
 // 	char			*name;
 // 	struct s_dlist	*next;
 // }					t_dlist;
-
 t_list		*sort_dir(t_list *head, t_opt *opt);
-t_list		*merge_list(t_list *a, t_list *b, t_opt *opt);
+t_list		*sort_list(t_list *head, t_opt *opt);
+t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k);
 
-// t_dlist		*list_new(char *name);
 int			list_add(t_list **head, char *name, size_t size);
 void		print_list(char *d, t_opt *opt);
-void		path(char *path_name, char *curr_dir, char *file_name);
+char		*path(char *path_name, char *curr_dir, char *file_name);
 
 #endif

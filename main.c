@@ -17,25 +17,36 @@ int		option(char *s, t_opt *opt)
 	opt->none = (!*(++s)) ? 1 : 0;
 	while (*s)
 	{
-		if (*s == 'l')
-			opt->l = 1;
-		else if (*s == 'R')
-			opt->rr = 1;
-		else if (*s == 'a')
-			opt->a = 1;
-		else if (*s == 'r')
-			opt->r = 1;
-		else if (*s == 't')
-			opt->t = 1;
-		else
+		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't')
 		{
 			printf("./ft_ls: illegal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
-			return (0);
+			return (0);	
 		}
+		opt->l = (*s == 'l') ? 1 : opt->l;
+		opt->r = (*s == 'r') ? 1 : opt->r;
+		opt->t = (*s == 't') ? 1 : opt->t;
+		opt->a = (*s == 'a') ? 1 : opt->a;
+		opt->rr = (*s == 'R') ? 1 : opt->rr;
 		++s;
 	}
 	return (1);
+}
+
+void	apply_opt(t_list *dir_list, char *dir, t_opt *opt)
+{
+	struct stat		i_entry;
+	struct tm time; 
+	char path_name[PATH_MAX + 1];
+	while (dir_list && !opt->none && (opt->l || opt->t))
+	{
+		lstat(path(path_name, dir, dir_list->content), &i_entry);
+		if (opt->t == 1)
+			dir_list->content_size = i_entry.st_mtime;
+		if (opt->l == 1)
+			printf("%u\n", i_entry.st_uid);
+		dir_list = dir_list->next;
+	}
 }
 
 t_list	*read_dir(char *d, t_opt *opt)
@@ -44,14 +55,17 @@ t_list	*read_dir(char *d, t_opt *opt)
 	t_list			*dir_list;
 	DIR				*dir;
 
+
 	dir_list = NULL;
 	if (!(dir = opendir(d)))
 		return (NULL);
 	while ((d_dir = readdir(dir)))
 	{
 		if (!(d_dir->d_name[0] == '.' && opt->a != 1))
+		{
 			if (!list_add(&dir_list, d_dir->d_name, d_dir->d_namlen))
 				return (NULL);
+		}
 	}
 	closedir(dir);
 	return (sort_dir(dir_list, opt));
@@ -73,8 +87,7 @@ t_list	*view_dir(char *d, t_opt *opt)
 			ft_strncmp(entry->d_name, "..", PATH_MAX) &&
 			(!(entry->d_name[0] == '.' && opt->a != 1)))
 		{
-			path(path_name, d, entry->d_name);
-			stat(path_name, &i_entry);
+			lstat(path(path_name, d, entry->d_name), &i_entry);
 			if (S_ISDIR(i_entry.st_mode))
 				if (!list_add(&list, path_name, ft_strlen(path_name)))
 					return (NULL);
@@ -84,11 +97,12 @@ t_list	*view_dir(char *d, t_opt *opt)
 	return (sort_dir(list, opt));
 }
 
-void	path(char *path_name, char *curr_dir, char *file_name)
+char	*path(char *path_name, char *curr_dir, char *file_name)
 {
 	ft_strncpy(path_name, curr_dir, PATH_MAX);
 	ft_strncat(path_name, "/", PATH_MAX);
 	ft_strncat(path_name, file_name, PATH_MAX);
+	return (path_name);
 }
 
 void	print_dir(char *curr_dir, t_opt *opt)
@@ -112,7 +126,7 @@ void	print_list(char *d, t_opt *opt)
 
 	if (!(list = read_dir(d, opt)))
 		return ;
-	// apply_opt(d, &list, opt);
+	apply_opt(list, d, opt);
 	while (list)
 	{
 		printf("%s\n", list->content);
