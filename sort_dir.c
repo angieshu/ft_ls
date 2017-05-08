@@ -72,3 +72,16 @@ t_list		*sort_dir(t_list *head, t_opt *opt)
 	}
 	return (list);
 }
+
+t_list	*listrev(t_list *list)
+{
+	t_list *rev;
+
+	rev = NULL;
+	while (list)
+	{
+		list_add(&rev, list->content, ft_strlen(list->content));
+		list = list->next;
+	}
+	return (rev);
+}
