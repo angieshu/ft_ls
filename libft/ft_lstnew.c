@@ -26,7 +26,7 @@ t_list	*ft_lstnew(char const *content, size_t content_size)
 	}
 	else
 	{
-		node_new->content = ft_memalloc(content_size + 1);
+		node_new->content = ft_strnew(content_size);
 		if (node_new->content == NULL)
 			return (NULL);
 		ft_memcpy(node_new->content, content, content_size);

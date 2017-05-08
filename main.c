@@ -1,3 +1,4 @@
+
 #include "ft_ls.h" 
 
 void	opt_reset(t_opt *opt)
@@ -8,6 +9,7 @@ void	opt_reset(t_opt *opt)
 	opt->t = 0;
 	opt->f = 0;
 	opt->u = 0;
+	opt->g = 0;
 	opt->rr = 0;
 	opt->tt = 0;
 	opt->none = 0;
@@ -21,7 +23,7 @@ int		option(char *s, t_opt *opt)
 	while (*s)
 	{
 		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't'
-			&& *s != 'T' && *s != 'f' && *s != 'u')
+			&& *s != 'T' && *s != 'f' && *s != 'u' && *s != 'g')
 		{
 			printf("./ft_ls: illegal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
@@ -33,6 +35,7 @@ int		option(char *s, t_opt *opt)
 		opt->a = (*s == 'a') ? 1 : opt->a;
 		opt->f = (*s == 'f') ? 1 : opt->f;
 		opt->u = (*s == 'u') ? 1 : opt->u;
+		opt->g = (*s == 'g') ? 1 : opt->g;
 		opt->rr = (*s == 'R') ? 1 : opt->rr;
 		opt->tt = (*s == 'T') ? 1 : opt->tt;
 		++s;
@@ -40,90 +43,59 @@ int		option(char *s, t_opt *opt)
 	return (1);
 }
 
-char	*time_s(char **time, t_opt *opt)
+void	time_s(time_t tim, t_opt *opt, char *content)
 {
-	char *s;
-	int i;
-	int n;
+	time_t curr_time;
+	struct tm *t;
 
-	i = 0;
-	n = 0;
-	s = (opt->tt == 1) ? ft_strnew(20) : ft_strnew(17);
-	while (**time != ' ')
-		(*time)++;
-	(*time)++;
-	while (**time != '\n')
-	{
-		n += (**time == ':') ? 1 : 0;
-		if (**time == ':' && n > 0 && opt->tt != 1)
-			(*time) += 3;
-		s[i++] = **time;
-		(*time)++;
-	}
-	return (s);
+	time(&curr_time);
+	t = localtime(&tim);
+	(t->tm_mon == 0) ? printf("Jan %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 1) ? printf("Feb %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 2) ? printf("Mar %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 3) ? printf("Apr %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 4) ? printf("May %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 5) ? printf("Jun %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 6) ? printf("Jul %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 7) ? printf("Aug %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 8) ? printf("Sep %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 9) ? printf("Oct %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 10) ? printf("Nov %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 11) ? printf("Dec %2d ", t->tm_mday) : 0;
+	if (localtime(&curr_time)->tm_year < localtime(&tim)->tm_year)
+		(opt->tt) ? printf("    %d", t->tm_year) : printf(" %d\n", t->tm_year);
+	else
+		printf("%02d:%02d", t->tm_hour, t->tm_min);
+	(opt->tt) ? printf(":%02d", t->tm_sec) : 0;
+	printf(" %s\n", content);
+
 }
 
-char	*permitions(char *perm)
+void	permitions(char *perm, int len)
 {
 	int i;
-	int len;
-	char *s;
 
 	i = 4;
-	s = ft_strnew(9);
-	len = ft_strlen(perm);
 	while (--i > 0)
 	{
-		if (perm[len - i] == '0')
-			ft_strncat(s, "---", PATH_MAX);
-		else if (perm[len - i] == '1')
-			ft_strncat(s, "--x", PATH_MAX);
-		else if (perm[len - i] == '2')
-			ft_strncat(s, "-w-", PATH_MAX);
-		else if (perm[len - i] == '3')
-			ft_strncat(s, "-wx", PATH_MAX);
-		else if (perm[len - i] == '4')
-			ft_strncat(s, "r--", PATH_MAX);
-		else if (perm[len - i] == '5')
-			ft_strncat(s, "r-x", PATH_MAX);
-		else if (perm[len - i] == '6')
-			ft_strncat(s, "rw-", PATH_MAX);
-		else if (perm[len - i] == '7')
-			ft_strncat(s, "rwx", PATH_MAX);
+		(perm[len - i] == '0') ? printf("---") : 0; 
+		(perm[len - i] == '1') ? printf("--x") : 0; 
+		(perm[len - i] == '2') ? printf("-w-") : 0; 
+		(perm[len - i] == '3') ? printf("-wx") : 0; 
+		(perm[len - i] == '4') ? printf("r--") : 0; 
+		(perm[len - i] == '5') ? printf("r-x") : 0; 
+		(perm[len - i] == '6') ? printf("rw-") : 0; 
+		(perm[len - i] == '7') ? printf("rwx") : 0; 
 	}
-	return (s);
+	free(perm);
 }
 
-char	*mode(mode_t st_mode)
-{
-	char *s;
-
-	s = ft_strnew(1);
-	if (S_ISBLK(st_mode))
-		s[0] = 'b';
-	else if (S_ISCHR(st_mode))
-		s[0] = 'c';
-	else if (S_ISDIR(st_mode))
-		s[0] = 'd';
-	else if (S_ISLNK(st_mode))
-		s[0] = 'l';
-	else if (S_ISSOCK(st_mode))
-		s[0] = 's';
-	else if (S_ISFIFO(st_mode))
-		s[0] = 'p';
-	else
-		s[0] = '-';
-	return (s);
-}
-
-char	*attrib(char *file)
+void	attrib(char *file)
 {
 	acl_t acl;
     acl_entry_t entry;
     ssize_t xattr = 0;
-    char *s;
 
-    s = ft_strnew(1);
     acl = acl_get_link_np(file, ACL_TYPE_EXTENDED);
     if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
     {
@@ -132,33 +104,146 @@ char	*attrib(char *file)
     }
     xattr = listxattr(file, NULL, 0, XATTR_NOFOLLOW);
     if (xattr > 0)
-        s[0] = '@';
+        printf("@ ");
     else if (acl != NULL)
-        s[0] = '+';
+        printf("+ ");
     else
-        s[0] = ' ';
-    return (s);
+        printf("  ");
 }
 
-void	apply_opt(t_list *dir_list, char *dir, t_opt *opt)
+void	link_l(int st_nlink, int len)
 {
-	struct stat	info;
-	char name[PATH_MAX + 1];
-	char *time;
-	int total;
+	int diff;
+	char *tmp;
 
-	total = 0;
-	while (dir_list)
+	tmp = ft_itoa_base(st_nlink, 10);
+	diff = len - ft_strlen(tmp);
+	while (diff-- > 0)
+		printf(" ");
+	printf("%d ", st_nlink);
+	free(tmp);
+}
+
+void	mode(mode_t st_mode, char *file, int st_nlink, int len)
+{
+	char *perm;
+	char *attr;
+
+	(S_ISBLK(st_mode)) ? printf("b") : 0;
+	(S_ISCHR(st_mode)) ? printf("c") : 0;
+	(S_ISDIR(st_mode)) ? printf("d") : 0;
+	(S_ISLNK(st_mode)) ? printf("l") : 0;
+	(S_ISREG(st_mode)) ? printf("-") : 0;
+	(S_ISSOCK(st_mode)) ? printf("s") : 0;
+	(S_ISFIFO(st_mode)) ? printf("p") : 0;
+	perm = ft_itoa_base(st_mode, 8);
+	permitions(perm, ft_strlen(perm));
+	attrib(file);
+	link_l(st_nlink, len);
+}
+
+void	user_id(uid_t user, int len)
+{
+	int diff;
+
+	diff = len - ft_strlen(getpwuid(user)->pw_name);
+	while (diff-- > 0)
+		printf(" ");
+	printf("%s  ", getpwuid(user)->pw_name);
+}
+
+void	size_l(intmax_t size, int len)
+{
+	int diff;
+	char *tmp;
+
+	tmp = ft_itoa_base(size, 10);
+	diff = len - ft_strlen(tmp);
+	while (diff-- > 0)
+		printf(" ");
+	printf("%s ", tmp);
+	free(tmp);
+}
+
+void	gr_id(gid_t group, int len_gr, intmax_t size, int len_s)
+{
+	int diff;
+
+	diff = len_gr - ft_strlen(getgrgid(group)->gr_name);
+	ft_putnchar(' ', diff);
+	printf("%s  ", getgrgid(group)->gr_name);
+	size_l(size, len_s);
+}
+
+void	apply_opt_2(t_list *list, t_list *original, t_opt *opt, int lnk, int user)
+{
+	int gr;
+	int size;
+	t_list *tmp;
+	struct stat i;
+
+	tmp = list;
+	gr = 0;
+	size = 0;
+	while (list)
 	{
-		lstat(path(name, dir, dir_list->content), &info);
-		time = (opt->u) ? ctime(&info.st_atime) : ctime(&info.st_mtime);
-		// printf("%s\n", time_s(&time, opt));
-			// printf("%d\n", info.st_nlink);
-		// printf("%s%s%s\n", mode(info.st_mode), permitions(ft_itoa_base(info.st_mode, 8)), attrib(name));
-		total += info.st_blocks;
-		dir_list = dir_list->next;
+		lstat(list->content, &i);
+		gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > gr) ?
+										ft_strlen(getgrgid(i.st_gid)->gr_name) : gr;
+		size = (ft_countnbr(i.st_size, 10) > size) ? ft_countnbr(i.st_size, 10) : size;
+		list = list->next;
+	}
+	while (tmp)
+	{
+		lstat(tmp->content, &i);
+		mode(i.st_mode, tmp->content, i.st_nlink, lnk);
+		if (!opt->g)
+			user_id(i.st_uid, user);
+		gr_id(i.st_gid, gr, i.st_size, size);
+		tmp = tmp->next;
+		time_s((opt->u) ? i.st_atime : i.st_mtime, opt, original->content);
+		original = original->next;
+	}
+}
+
+void	apply_opt_1(t_list *list, t_list *original, t_opt *opt, int total, int lnk)
+{
+	int user;
+	t_list *tmp;
+	struct stat i;
+
+	user = 0;
+	tmp = list;
+	while (list)
+	{
+		lstat(list->content, &i);
+		lnk = (ft_countnbr(i.st_nlink, 10) > lnk) ? ft_countnbr(i.st_nlink, 10) : lnk;
+		user = (ft_strlen(getpwuid(i.st_uid)->pw_name) > user) ?
+										ft_strlen(getpwuid(i.st_uid)->pw_name) : user;
+		list = list->next;
+		total += i.st_blocks;
 	}
 	printf("total %d\n", total);
+	apply_opt_2(tmp, original, opt, lnk, user);
+}
+
+void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
+{
+	char name[PATH_MAX + 1];
+	t_list *new_l;
+	t_list *tmp;
+
+	tmp = dir_list;
+	path(name, dir, dir_list->content);
+	new_l = ft_lstnew(name, ft_strlen(name));
+	dir_list = dir_list->next;
+	while (dir_list)
+	{
+		path(name, dir, dir_list->content);
+		list_add_back(new_l, name, ft_strlen(name));
+		dir_list = dir_list->next;
+	}
+	apply_opt_1(new_l, tmp, opt, 0, 0);
 }
 
 t_list	*read_dir(char *d, t_opt *opt)
@@ -248,8 +333,8 @@ void	print_list(char *d, t_opt *opt)
 	if (!(list = read_dir(d, opt)))
 		return ;
 	if (opt->l == 1)
-		apply_opt(list, d, opt);
-	while (list)
+		apply_l(list, d, opt);
+	while (list && !opt->l)
 	{
 		printf("%s\n", list->content);
 		list = list->next;
@@ -263,12 +348,10 @@ void	check_directory(int ac, char **av, t_opt *opt, int i)
 {
 	if (i == ac)
 		print_list(".", opt);
-		// read_dir(getenv("PWD"), opt);
 	else
 	{
 		while (i < ac)
 			print_list(av[i++], opt);
-			// read_dir(av[i++], opt);
 	}
 }
 

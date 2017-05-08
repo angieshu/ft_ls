@@ -27,12 +27,12 @@ static char	*pure_s(long double nbr, int k)
 	if (n == 0)
 	{
 		n = (uintmax_t)nbr * ft_power(10, k - 1);
-		count = ft_countnumber(n, 10);
+		count = ft_countnbr(n, 10);
 		if (count <= k)
 			return (ft_itoa_double(nbr, k));
 		return (ft_itoa_exp(nbr, k));
 	}
-	count = ft_countnumber(n, 10);
+	count = ft_countnbr(n, 10);
 	if (count <= k)
 		return (ft_itoa_double(nbr, k - count));
 	return (ft_itoa_exp(nbr, k - 1));

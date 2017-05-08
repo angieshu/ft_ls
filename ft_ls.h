@@ -25,6 +25,7 @@ typedef struct		s_opt
 	int t;
 	int f;
 	int u;
+	int g;
 	int rr;
 	int tt;
 	int none;
@@ -38,6 +39,7 @@ t_list		*listrev(t_list *list);
 int			list_add(t_list **head, char *name, size_t size);
 void		print_list(char *d, t_opt *opt);
 char		*path(char *path_name, char *curr_dir, char *file_name);
+void		list_add_back(t_list *head, char *name, size_t size);
 
 
 #endif

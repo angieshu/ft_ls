@@ -55,7 +55,7 @@ static char	*ft_count_power(long double nbr, int k, int sign)
 		nbr /= 10;
 	}
 	tmp = ft_itoa_double(nbr * sign, k);
-	s = (ft_countnumber(i, 10) < 10) ? ft_strjoin(tmp, "e+0") :
+	s = (ft_countnbr(i, 10) < 10) ? ft_strjoin(tmp, "e+0") :
 		ft_strjoin(tmp, "e+");
 	tmp = s;
 	s = ft_strjoin(tmp, ft_itoa(i));
@@ -78,7 +78,7 @@ static char	*ft_count_power_neg(long double nbr, int k, int sign)
 		nbr /= 10;
 	}
 	tmp = ft_itoa_double(nbr * sign, k);
-	s = (ft_countnumber(i, 10) < 10) ? ft_strjoin(tmp, "e-0") :
+	s = (ft_countnbr(i, 10) < 10) ? ft_strjoin(tmp, "e-0") :
 		ft_strjoin(tmp, "e-");
 	tmp = s;
 	s = ft_strjoin(tmp, ft_itoa(i));
