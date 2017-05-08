@@ -170,8 +170,9 @@ void	gr_id(gid_t group, int len_gr, intmax_t size, int len_s)
 	int diff;
 
 	diff = len_gr - ft_strlen(getgrgid(group)->gr_name);
-	ft_putnchar(' ', diff);
 	printf("%s  ", getgrgid(group)->gr_name);
+	while (diff-- > 0)
+		printf(" ");
 	size_l(size, len_s);
 }
 
@@ -181,6 +182,7 @@ void	apply_opt_2(t_list *list, t_list *original, t_opt *opt, int lnk, int user)
 	int size;
 	t_list *tmp;
 	struct stat i;
+	char lnk_s[PATH_MAX + 1];
 
 	tmp = list;
 	gr = 0;
@@ -202,6 +204,9 @@ void	apply_opt_2(t_list *list, t_list *original, t_opt *opt, int lnk, int user)
 		gr_id(i.st_gid, gr, i.st_size, size);
 		tmp = tmp->next;
 		time_s((opt->u) ? i.st_atime : i.st_mtime, opt, original->content);
+		if (S_ISLNK(i.st_mode))
+			(readlink(list->content, lnk_s, PATH_MAX) != -1) ? printf(" -> %s", lnk_s)
+									: printf("-> (invalid symbolic link!)");
 		original = original->next;
 	}
 }
@@ -329,6 +334,7 @@ void	print_dir(char *curr_dir, t_opt *opt)
 void	print_list(char *d, t_opt *opt)
 {
 	t_list *list;
+	char path_name[PATH_MAX + 1];
 
 	if (!(list = read_dir(d, opt)))
 		return ;
