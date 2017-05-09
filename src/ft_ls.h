@@ -1,6 +1,6 @@
 #ifndef FT_LS_H
 # define FT_LS_H
-# include "libft/libft.h"
+# include "../libft/libft.h"
 // # include "libftprintf.h"
 # include <dirent.h>
 # include <sys/stat.h>
@@ -68,6 +68,7 @@ void		permitions(char *perm, int len);
 void		attrib(char *file);
 void		mode(mode_t st_mode, char *file, int st_nlink, int len);
 void		time_s(time_t tim, t_opt *opt, char *content);
+void		apply_l(t_list *dir_list, char *dir, t_opt *opt);
 
 
 void		opt_reset(t_opt *opt);
@@ -78,11 +79,13 @@ char		*path(char *path_name, char *curr_dir, char *file_name);
 void		print_list(char *d, t_opt *opt);
 void		print_dir(char *curr_dir, t_opt *opt);
 void		print_output(t_list *list, t_opt *opt);
-void		print_output_dir(t_list *list, t_opt *opt);
-void		check_dir(char **av, int i, int ac, t_opt *opt);
+void		print_output_dir(t_list *list, t_opt *opt, int flag);
+void		check_dir(char **av, int i, int ac, t_opt *opt, int flag);
 void		print_list(char *d, t_opt *opt);
 t_list		*view_dir(char *d, t_opt *opt);
 t_list		*read_dir(char *d, t_opt *opt);
 int			option(char *s, t_opt *opt);
 
+void		free_list(t_list **list);
+void		free_out(t_output *out);
 #endif

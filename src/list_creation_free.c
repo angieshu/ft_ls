@@ -35,3 +35,24 @@ void	list_add_back(t_list *head, char *name, size_t size)
 	if ((tmp = ft_lstnew(name,size)))
 		head->next = tmp;
 }
+
+void	free_list(t_list **list)
+{
+	t_list *tmp;
+
+	tmp = *list;
+	while (tmp)
+	{
+		free(tmp->content);
+		tmp = tmp->next;
+	}
+	free(*list);
+}
+
+void	free_out(t_output *out)
+{
+	free_list(&out->notexist);
+	free_list(&out->notdir);
+	free_list(&out->dir);
+	free(out);
+}

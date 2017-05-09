@@ -83,5 +83,6 @@ t_list	*listrev(t_list *list)
 		list_add(&rev, list->content, ft_strlen(list->content));
 		list = list->next;
 	}
+	free_list(&list);
 	return (rev);
 }

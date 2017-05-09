@@ -20,14 +20,14 @@ void	print_dir(char *curr_dir, t_opt *opt)
 		return ;
 	while (list)
 	{
-		printf("%s:\n", list->content);
+		printf("\n%s:\n", list->content);
 		print_list(list->content, opt);
 		list = list->next;
 	}
 	free(list);
 }
 
-void print_output(t_list *list, t_opt *opt)
+void	print_output(t_list *list, t_opt *opt)
 {
 	while (list)
 	{
@@ -36,11 +36,12 @@ void print_output(t_list *list, t_opt *opt)
 	}
 }
 
-void	print_output_dir(t_list *list, t_opt *opt)
+void	print_output_dir(t_list *list, t_opt *opt, int flag)
 {
 	int n;
 
 	n = 0;
+	(flag && !list->next) ? printf("%s:\n", list->content) : 0;
 	if (!list->next)
 	{
 		print_list(list->content, opt);
@@ -56,7 +57,7 @@ void	print_output_dir(t_list *list, t_opt *opt)
 	}
 }
 
-void	check_dir(char **av, int i, int ac, t_opt *opt)
+void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
 {
 	t_output *out;
 	struct stat n;
@@ -64,19 +65,21 @@ void	check_dir(char **av, int i, int ac, t_opt *opt)
 	list_set(&out);
 	while (i < ac)
 	{
-		stat(av[i], &info);
+		stat(av[i], &n);
 		if (!S_ISDIR(n.st_mode) && !S_ISBLK(n.st_mode) && !S_ISCHR(n.st_mode)
 			&& !S_ISFIFO(n.st_mode) && !S_ISREG(n.st_mode) &&
 			!S_ISLNK(n.st_mode) && !S_ISSOCK(n.st_mode))
 			list_add(&(out->notexist), av[i], ft_strlen(av[i]));
-		else if (!S_ISDIR(info.st_mode))
+		else if (!S_ISDIR(n.st_mode))
 			list_add(&(out->notdir), av[i], ft_strlen(av[i]));
 		else
 			list_add(&(out->dir), av[i], ft_strlen(av[i]));
 		i++;
-		info.st_mode = 0;
+		n.st_mode = 0;
 	}
+	flag = (!out->notexist && !out->notdir && out->dir) ? 0 : 1;
 	print_output(sort_dir(out->notexist, opt), opt);
 	print_output(sort_dir(out->notdir, opt), opt);
-	print_output_dir(sort_dir(out->dir, opt), opt);
+	print_output_dir(sort_dir(out->dir, opt), opt, flag);
+	free_out(out);
 }
