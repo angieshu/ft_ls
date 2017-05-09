@@ -39,7 +39,15 @@ typedef struct	s_len
 	int gr;
 	int size;
 	int total;
-}				t_len;	
+}				t_len;
+
+typedef struct	s_output
+{
+	t_list *notexist;
+	t_list *notdir;
+	t_list *dir;
+	t_list *noperm;
+}				t_output;
 
 t_list		*sort_dir(t_list *head, t_opt *opt);
 t_list		*sort_list(t_list *head, t_opt *opt);

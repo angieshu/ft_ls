@@ -26,8 +26,8 @@ int		option(char *s, t_opt *opt)
 		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't'
 			&& *s != 'T' && *s != 'f' && *s != 'u' && *s != 'g' && *s != 'd')
 		{
-			printf("./ft_ls: illegal option -- %c\n", *s);
-			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
+			printf("ft_ls: illegal option -- %c\n", *s);
+			printf("usage: ft_ls [-RTadfglrtu] [file ...]\n");
 			return (0);	
 		}
 		opt->l = (*s == 'l') ? 1 : opt->l;
@@ -129,7 +129,6 @@ void	link_l(int st_nlink, int len)
 void	mode(mode_t st_mode, char *file, int st_nlink, int len)
 {
 	char *perm;
-	char *attr;
 
 	(S_ISREG(st_mode)) ? printf("-") : 0;
 	(S_ISDIR(st_mode)) ? printf("d") : 0;
@@ -205,6 +204,11 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 	t_list *tmp;
 	struct stat i;
 
+	if (!list->next)
+	{
+		apply_opt(list, original, opt, *l);
+		return ;
+	}
 	tmp = list;
 	while (list)
 	{
@@ -226,10 +230,10 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 
 void	opt_set(t_len *l)
 {
-	l->lnk = 0;
-	l->us = 0;
-	l->gr = 0;
-	l->size = 0;
+	l->lnk = 1;
+	l->us = 1;
+	l->gr = 1;
+	l->size = 1;
 	l->total = 0;
 }
 
@@ -241,6 +245,11 @@ void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
 	t_len l;
 
 	opt_set(&l);
+	if (!dir_list->next)
+	{
+		min_width(dir_list, dir_list, opt, &l);
+		return ;
+	}
 	tmp = dir_list;
 	path(name, dir, dir_list->content);
 	new_l = ft_lstnew(name, ft_strlen(name));
@@ -327,46 +336,128 @@ void	print_dir(char *curr_dir, t_opt *opt)
 		return ;
 	while (list)
 	{
-		printf("\n%s:\n", list->content);
+		printf("%s:\n", list->content);
 		print_list(list->content, opt);
 		list = list->next;
 	}
 	free(list);
 }
 
+void	list_set(t_output **out)
+{
+	*out = (t_output*)ft_memalloc(sizeof(t_output));
+	(*out)->notexist = NULL;
+	(*out)->notdir = NULL;
+	(*out)->dir = NULL;
+}
+
+void print_output(t_list *list, t_opt *opt)
+{
+	while (list)
+	{
+		print_list(list->content, opt);
+		list = list->next;
+	}
+}
+
+void	print_output_dir(t_list *list, t_opt *opt)
+{
+	int n;
+
+	n = 0;
+	if (!list->next)
+	{
+		print_list(list->content, opt);
+		return ;
+	}
+	while (list)
+	{
+		(n == 0) ? 0 : printf("\n");
+		printf("%s:\n", list->content);
+		print_list(list->content, opt);
+		list = list->next;
+		n++;
+	}
+}
+
+void	check_dir(char **av, int i, int ac, t_opt *opt)
+{
+	t_output *out;
+	struct stat info;
+
+	list_set(&out);
+	while (i < ac)
+	{
+		stat(av[i], &info);
+		if (!S_ISDIR(info.st_mode) && !S_ISBLK(info.st_mode) && !S_ISCHR(info.st_mode)
+		&& !S_ISFIFO(info.st_mode) && !S_ISREG(info.st_mode) &&
+		!S_ISLNK(info.st_mode) && !S_ISSOCK(info.st_mode))
+			list_add(&(out->notexist), av[i], ft_strlen(av[i]));
+		else if (!S_ISDIR(info.st_mode))
+			list_add(&(out->notdir), av[i], ft_strlen(av[i]));
+		else
+			list_add(&(out->dir), av[i], ft_strlen(av[i]));
+		i++;
+		info.st_mode = 0;
+	}
+	print_output(sort_dir(out->notexist, opt), opt);
+	print_output(sort_dir(out->notdir, opt), opt);
+	print_output_dir(sort_dir(out->dir, opt), opt);
+
+}
+
+// void print_list(char *d, t_opt *opt)
+// {
+// 	t_list *list;
+// 	struct stat i;
+
+// 	lstat(d, &i)
+// 	if (!S_ISDIR(i.st_mode) || opt->d)
+// 	if (S_ISDIR(i.st_mode) && !opt->d && (list = readdir(av[i], opt)))
+// 		while(list)
+// 		{
+// 			printf("%s\n", list_content);
+// 			list = list->next;
+// 		}
+
+
+// }
+
 void	print_list(char *d, t_opt *opt)
 {
 	t_list *list;
-	char path_name[PATH_MAX + 1];
 	struct stat i;
 
 	lstat(d, &i);
-	if (!S_ISDIR(i.st_mode) || opt->d)
-		list = ft_lstnew(d, ft_strlen(d));
-	else if (!(list = read_dir(d, opt)))
+	if (!S_ISDIR(i.st_mode) && !S_ISBLK(i.st_mode) && !S_ISCHR(i.st_mode)
+		&& !S_ISFIFO(i.st_mode) && !S_ISREG(i.st_mode) &&
+		!S_ISLNK(i.st_mode) && !S_ISSOCK(i.st_mode))
+	{
+		printf("ft_ls: %s: No such file or directory\n", d);
 		return ;
-	if (opt->l == 1)
-		apply_l(list, d, opt);
+	}
+	// if (S_ISDIR(i.st_mode) &&
+	// 	ft_itoa_base(i.st_mode,10)[ft_strlen(ft_itoa_base(i.st_mode,10)) - 3] < '4')
+	// {
+	// 	return ;
+	// }
+		
+	(!S_ISDIR(i.st_mode) || opt->d) ? list = ft_lstnew(d, ft_strlen(d)) : 0;
+	if (S_ISDIR(i.st_mode) && !(list = read_dir(d, opt)))
+	{
+		printf("ls: %s: Permission denied\n", d);
+		return ;
+	}
+	(opt->l == 1) ? apply_l(list, d, opt) : 0;
 	while (list && !opt->l)
 	{
 		printf("%s\n", list->content);
 		list = list->next;
 	}
-	free(list);
-	if (opt->rr == 1)
-		print_dir(d, opt);
+	//free(list);
+	(opt->rr == 1) ? print_dir(d, opt) : 0;
 }
 
-void	check_directory(int ac, char **av, t_opt *opt, int i)
-{
-	if (i == ac)
-		print_list(".", opt);
-	else
-	{
-		while (i < ac)
-			print_list(av[i++], opt);
-	}
-}
 
 int		main(int ac, char **av)
 {
@@ -381,5 +472,5 @@ int		main(int ac, char **av)
 			return (0);
 		i++;
 	}
-	check_directory(ac, av, &opt, i);
+	(i == ac) ? print_list(".", &opt) : check_dir(av, i, ac, &opt);
 }
