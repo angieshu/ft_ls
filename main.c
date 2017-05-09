@@ -10,6 +10,7 @@ void	opt_reset(t_opt *opt)
 	opt->f = 0;
 	opt->u = 0;
 	opt->g = 0;
+	opt->d = 0;
 	opt->rr = 0;
 	opt->tt = 0;
 	opt->none = 0;
@@ -23,7 +24,7 @@ int		option(char *s, t_opt *opt)
 	while (*s)
 	{
 		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't'
-			&& *s != 'T' && *s != 'f' && *s != 'u' && *s != 'g')
+			&& *s != 'T' && *s != 'f' && *s != 'u' && *s != 'g' && *s != 'd')
 		{
 			printf("./ft_ls: illegal option -- %c\n", *s);
 			printf("usage: ./ft_ls [-Ralrt] [file ...]\n");
@@ -36,7 +37,8 @@ int		option(char *s, t_opt *opt)
 		opt->f = (*s == 'f') ? 1 : opt->f;
 		opt->u = (*s == 'u') ? 1 : opt->u;
 		opt->g = (*s == 'g') ? 1 : opt->g;
-		opt->rr = (*s == 'R') ? 1 : opt->rr;
+		opt->d = (*s == 'd') ? 1 : opt->d;
+ 		opt->rr = (*s == 'R') ? 1 : opt->rr;
 		opt->tt = (*s == 'T') ? 1 : opt->tt;
 		++s;
 	}
@@ -198,7 +200,7 @@ void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 	}
 }
 
-void	min_width(t_list *list, t_list *original, t_opt *opt, t_len l)
+void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 {
 	t_list *tmp;
 	struct stat i;
@@ -207,28 +209,28 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len l)
 	while (list)
 	{
 		lstat(list->content, &i);
-		l.lnk = (ft_countnbr(i.st_nlink, 10) > l.lnk) ?
-									ft_countnbr(i.st_nlink, 10) : l.lnk;
-		l.us = (ft_strlen(getpwuid(i.st_uid)->pw_name) > l.us) ?
-							ft_strlen(getpwuid(i.st_uid)->pw_name) : l.us;
-		l.gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > l.gr) ?
-							ft_strlen(getgrgid(i.st_gid)->gr_name) : l.gr;
-		l.size = (ft_countnbr(i.st_size, 10) > l.size) ?
-										ft_countnbr(i.st_size, 10) :l.size;
+		l->lnk = (ft_countnbr(i.st_nlink, 10) > l->lnk) ?
+									ft_countnbr(i.st_nlink, 10) : l->lnk;
+		l->us = (ft_strlen(getpwuid(i.st_uid)->pw_name) > l->us) ?
+							ft_strlen(getpwuid(i.st_uid)->pw_name) : l->us;
+		l->gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > l->gr) ?
+							ft_strlen(getgrgid(i.st_gid)->gr_name) : l->gr;
+		l->size = (ft_countnbr(i.st_size, 10) > l->size) ?
+										ft_countnbr(i.st_size, 10) :l->size;
 		list = list->next;
-		l.total += i.st_blocks;
+		l->total += i.st_blocks;
 	}
-	printf("total %d\n",l. total);
-	apply_opt(tmp, original, opt, l);
+	printf("total %d\n", l->total);
+	apply_opt(tmp, original, opt, *l);
 }
 
-void	opt_set(t_len l)
+void	opt_set(t_len *l)
 {
-	l.lnk = 0;
-	l.us = 0;
-	l.gr = 0;
-	l.size = 0;
-	l.total = 0;
+	l->lnk = 0;
+	l->us = 0;
+	l->gr = 0;
+	l->size = 0;
+	l->total = 0;
 }
 
 void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
@@ -238,8 +240,8 @@ void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
 	t_list *tmp;
 	t_len l;
 
+	opt_set(&l);
 	tmp = dir_list;
-	opt_set(l);
 	path(name, dir, dir_list->content);
 	new_l = ft_lstnew(name, ft_strlen(name));
 	dir_list = dir_list->next;
@@ -249,7 +251,7 @@ void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
 		list_add_back(new_l, name, ft_strlen(name));
 		dir_list = dir_list->next;
 	}
-	min_width(new_l, tmp, opt, l);
+	min_width(new_l, tmp, opt, &l);
 }
 
 t_list	*read_dir(char *d, t_opt *opt)
@@ -336,8 +338,12 @@ void	print_list(char *d, t_opt *opt)
 {
 	t_list *list;
 	char path_name[PATH_MAX + 1];
+	struct stat i;
 
-	if (!(list = read_dir(d, opt)))
+	lstat(d, &i);
+	if (!S_ISDIR(i.st_mode) || opt->d)
+		list = ft_lstnew(d, ft_strlen(d));
+	else if (!(list = read_dir(d, opt)))
 		return ;
 	if (opt->l == 1)
 		apply_l(list, d, opt);

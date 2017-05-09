@@ -26,6 +26,7 @@ typedef struct	s_opt
 	int f;
 	int u;
 	int g;
+	int d;
 	int rr;
 	int tt;
 	int none;
@@ -49,6 +50,8 @@ int			list_add(t_list **head, char *name, size_t size);
 void		print_list(char *d, t_opt *opt);
 char		*path(char *path_name, char *curr_dir, char *file_name);
 void		list_add_back(t_list *head, char *name, size_t size);
+void		opt_set(t_len *l);
+
 
 
 #endif
