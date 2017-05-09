@@ -17,7 +17,7 @@
 # include <errno.h>
 # include <time.h>
 
-typedef struct		s_opt
+typedef struct	s_opt
 {
 	int l;
 	int a;
@@ -29,7 +29,16 @@ typedef struct		s_opt
 	int rr;
 	int tt;
 	int none;
-}					t_opt;
+}				t_opt;
+
+typedef struct	s_len
+{
+	int lnk;
+	int us;
+	int gr;
+	int size;
+	int total;
+}				t_len;	
 
 t_list		*sort_dir(t_list *head, t_opt *opt);
 t_list		*sort_list(t_list *head, t_opt *opt);

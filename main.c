@@ -67,7 +67,7 @@ void	time_s(time_t tim, t_opt *opt, char *content)
 	else
 		printf("%02d:%02d", t->tm_hour, t->tm_min);
 	(opt->tt) ? printf(":%02d", t->tm_sec) : 0;
-	printf(" %s\n", content);
+	printf(" %s", content);
 
 }
 
@@ -129,11 +129,11 @@ void	mode(mode_t st_mode, char *file, int st_nlink, int len)
 	char *perm;
 	char *attr;
 
+	(S_ISREG(st_mode)) ? printf("-") : 0;
+	(S_ISDIR(st_mode)) ? printf("d") : 0;
 	(S_ISBLK(st_mode)) ? printf("b") : 0;
 	(S_ISCHR(st_mode)) ? printf("c") : 0;
-	(S_ISDIR(st_mode)) ? printf("d") : 0;
 	(S_ISLNK(st_mode)) ? printf("l") : 0;
-	(S_ISREG(st_mode)) ? printf("-") : 0;
 	(S_ISSOCK(st_mode)) ? printf("s") : 0;
 	(S_ISFIFO(st_mode)) ? printf("p") : 0;
 	perm = ft_itoa_base(st_mode, 8);
@@ -176,60 +176,59 @@ void	gr_id(gid_t group, int len_gr, intmax_t size, int len_s)
 	size_l(size, len_s);
 }
 
-void	apply_opt_2(t_list *list, t_list *original, t_opt *opt, int lnk, int user)
+void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 {
-	int gr;
-	int size;
-	t_list *tmp;
 	struct stat i;
 	char lnk_s[PATH_MAX + 1];
 
-	tmp = list;
-	gr = 0;
-	size = 0;
 	while (list)
 	{
 		lstat(list->content, &i);
-		gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > gr) ?
-										ft_strlen(getgrgid(i.st_gid)->gr_name) : gr;
-		size = (ft_countnbr(i.st_size, 10) > size) ? ft_countnbr(i.st_size, 10) : size;
-		list = list->next;
-	}
-	while (tmp)
-	{
-		lstat(tmp->content, &i);
-		mode(i.st_mode, tmp->content, i.st_nlink, lnk);
+		mode(i.st_mode, list->content, i.st_nlink, l.lnk);
 		if (!opt->g)
-			user_id(i.st_uid, user);
-		gr_id(i.st_gid, gr, i.st_size, size);
-		tmp = tmp->next;
+			user_id(i.st_uid, l.us);
+		gr_id(i.st_gid, l.gr, i.st_size, l.size);
 		time_s((opt->u) ? i.st_atime : i.st_mtime, opt, original->content);
 		if (S_ISLNK(i.st_mode))
-			(readlink(list->content, lnk_s, PATH_MAX) != -1) ? printf(" -> %s", lnk_s)
-									: printf("-> (invalid symbolic link!)");
-		original = original->next;
+			(readlink(list->content, lnk_s, PATH_MAX) != 1) ?
+			printf(" -> %s", lnk_s) : printf(" -> (invalid symbolic link!)");
+		printf("\n");
+		list = list->next;
+		original = original->next; 
 	}
 }
 
-void	apply_opt_1(t_list *list, t_list *original, t_opt *opt, int total, int lnk)
+void	min_width(t_list *list, t_list *original, t_opt *opt, t_len l)
 {
-	int user;
 	t_list *tmp;
 	struct stat i;
 
-	user = 0;
 	tmp = list;
 	while (list)
 	{
 		lstat(list->content, &i);
-		lnk = (ft_countnbr(i.st_nlink, 10) > lnk) ? ft_countnbr(i.st_nlink, 10) : lnk;
-		user = (ft_strlen(getpwuid(i.st_uid)->pw_name) > user) ?
-										ft_strlen(getpwuid(i.st_uid)->pw_name) : user;
+		l.lnk = (ft_countnbr(i.st_nlink, 10) > l.lnk) ?
+									ft_countnbr(i.st_nlink, 10) : l.lnk;
+		l.us = (ft_strlen(getpwuid(i.st_uid)->pw_name) > l.us) ?
+							ft_strlen(getpwuid(i.st_uid)->pw_name) : l.us;
+		l.gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > l.gr) ?
+							ft_strlen(getgrgid(i.st_gid)->gr_name) : l.gr;
+		l.size = (ft_countnbr(i.st_size, 10) > l.size) ?
+										ft_countnbr(i.st_size, 10) :l.size;
 		list = list->next;
-		total += i.st_blocks;
+		l.total += i.st_blocks;
 	}
-	printf("total %d\n", total);
-	apply_opt_2(tmp, original, opt, lnk, user);
+	printf("total %d\n",l. total);
+	apply_opt(tmp, original, opt, l);
+}
+
+void	opt_set(t_len l)
+{
+	l.lnk = 0;
+	l.us = 0;
+	l.gr = 0;
+	l.size = 0;
+	l.total = 0;
 }
 
 void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
@@ -237,8 +236,10 @@ void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
 	char name[PATH_MAX + 1];
 	t_list *new_l;
 	t_list *tmp;
+	t_len l;
 
 	tmp = dir_list;
+	opt_set(l);
 	path(name, dir, dir_list->content);
 	new_l = ft_lstnew(name, ft_strlen(name));
 	dir_list = dir_list->next;
@@ -248,7 +249,7 @@ void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
 		list_add_back(new_l, name, ft_strlen(name));
 		dir_list = dir_list->next;
 	}
-	apply_opt_1(new_l, tmp, opt, 0, 0);
+	min_width(new_l, tmp, opt, l);
 }
 
 t_list	*read_dir(char *d, t_opt *opt)
