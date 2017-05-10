@@ -13,31 +13,31 @@
 
 #include "ft_ls.h" 
 
-int		option(char *s, t_opt *opt)
+int		option(char **s, t_opt *opt)
 {
-	if (!ft_strcmp("--", s))
+	if (!ft_strcmp("--", *s))
 		return (1);
-	opt->none = (!*(++s)) ? 1 : 0;
-	while (*s)
+	opt->none = (!++(*s)) ? 1 : 0;
+	while (**s)
 	{
-		if (*s != 'l' && *s != 'R' && *s != 'a' && *s != 'r' && *s != 't'
-			&& *s != 'T' && *s != 'f' && *s != 'u' && *s != 'g' && *s != 'd')
+		if (**s != 'l' && **s != 'R' && **s != 'a' && **s != 'r' && **s != 't'
+			&& **s != 'T' && **s != 'f' && **s != 'u' && **s != 'g' && **s != 'd')
 		{
-			printf("ft_ls: illegal option -- %c\n", *s);
+			printf("ft_ls: illegal option -- %c\n", **s);
 			printf("usage: ft_ls [-RTadfglrtu] [file ...]\n");
 			return (0);	
 		}
-		opt->l = (*s == 'l') ? 1 : opt->l;
-		opt->r = (*s == 'r') ? 1 : opt->r;
-		opt->t = (*s == 't') ? 1 : opt->t;
-		opt->a = (*s == 'a') ? 1 : opt->a;
-		opt->f = (*s == 'f') ? 1 : opt->f;
-		opt->u = (*s == 'u') ? 1 : opt->u;
-		opt->g = (*s == 'g') ? 1 : opt->g;
-		opt->d = (*s == 'd') ? 1 : opt->d;
- 		opt->rr = (*s == 'R') ? 1 : opt->rr;
-		opt->tt = (*s == 'T') ? 1 : opt->tt;
-		++s;
+		opt->l = (**s == 'l') ? 1 : opt->l;
+		opt->r = (**s == 'r') ? 1 : opt->r;
+		opt->t = (**s == 't') ? 1 : opt->t;
+		opt->a = (**s == 'a') ? 1 : opt->a;
+		opt->f = (**s == 'f') ? 1 : opt->f;
+		opt->u = (**s == 'u') ? 1 : opt->u;
+		opt->g = (**s == 'g') ? 1 : opt->g;
+		opt->d = (**s == 'd') ? 1 : opt->d;
+ 		opt->rr = (**s == 'R') ? 1 : opt->rr;
+		opt->tt = (**s == 'T') ? 1 : opt->tt;
+		++(*s);
 	}
 	return (1);
 }
@@ -90,6 +90,7 @@ t_list	*view_dir(char *d, t_opt *opt)
 			(!(entry->d_name[0] == '.' && opt->a != 1)))
 		{
 			lstat(path(path_name, d, entry->d_name), &info);
+			list->content_size = (opt->u) ? info.st_atime : info.st_mtime;
 			if (S_ISDIR(info.st_mode))
 				if (!list_add(&list, path_name, ft_strlen(path_name)))
 					return (NULL);
@@ -136,14 +137,12 @@ int		main(int ac, char **av)
 
 	i = 1;
 	opt_reset(&opt);
-	while (av[i][0] == '-')
+	while (i < ac && av[i][0] == '-')
 	{
-		if (!option(av[i], &opt))
+		if (!option(&av[i], &opt))
 			return (0);
 		i++;
 	}
-		printf("======here=======\n");
-
 	(i == ac) ? print_list(".", &opt) : check_dir(av, i, ac, &opt, 0);
 	return (0);
 }

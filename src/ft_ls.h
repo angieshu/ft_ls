@@ -84,7 +84,7 @@ void		check_dir(char **av, int i, int ac, t_opt *opt, int flag);
 void		print_list(char *d, t_opt *opt);
 t_list		*view_dir(char *d, t_opt *opt);
 t_list		*read_dir(char *d, t_opt *opt);
-int			option(char *s, t_opt *opt);
+int			option(char **s, t_opt *opt);
 
 void		free_list(t_list **list);
 void		free_out(t_output *out);

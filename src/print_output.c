@@ -24,7 +24,7 @@ void	print_dir(char *curr_dir, t_opt *opt)
 		print_list(list->content, opt);
 		list = list->next;
 	}
-	free(list);
+	// free(list);
 }
 
 void	print_output(t_list *list, t_opt *opt)
@@ -78,6 +78,7 @@ void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
 		n.st_mode = 0;
 	}
 	flag = (!out->notexist && !out->notdir && out->dir) ? 0 : 1;
+	flag = (!out->notdir && !out->dir && out->notexist) ? 1 : 0;
 	print_output(sort_dir(out->notexist, opt), opt);
 	print_output(sort_dir(out->notdir, opt), opt);
 	print_output_dir(sort_dir(out->dir, opt), opt, flag);

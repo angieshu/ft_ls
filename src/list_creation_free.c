@@ -43,16 +43,17 @@ void	free_list(t_list **list)
 	tmp = *list;
 	while (tmp)
 	{
-		free(tmp->content);
+		(tmp->content) ? free(tmp->content) : 0;
 		tmp = tmp->next;
 	}
-	free(*list);
+
+	(list) ? free(*list) : 0;
 }
 
 void	free_out(t_output *out)
 {
-	free_list(&out->notexist);
-	free_list(&out->notdir);
-	free_list(&out->dir);
+	(out->notexist) ? free_list(&out->notexist) : 0;
+	(out->notdir) ? free_list(&out->notdir) : 0;
+	(out->dir) ? free_list(&out->dir) : 0;
 	free(out);
 }

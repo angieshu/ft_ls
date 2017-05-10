@@ -64,7 +64,6 @@ t_list		*sort_dir(t_list *head, t_opt *opt)
 {
 	t_list *list;
 
-	printf("======here=======\n");
 	list = sort_list(head, opt);
 	if (opt->t == 1)
 	{
