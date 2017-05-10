@@ -90,10 +90,11 @@ t_list	*view_dir(char *d, t_opt *opt)
 			(!(entry->d_name[0] == '.' && opt->a != 1)))
 		{
 			lstat(path(path_name, d, entry->d_name), &info);
-			list->content_size = (opt->u) ? info.st_atime : info.st_mtime;
 			if (S_ISDIR(info.st_mode))
-				if (!list_add(&list, path_name, ft_strlen(path_name)))
-					return (NULL);
+			{
+				list_add(&list, path_name, ft_strlen(path_name));
+				list->content_size = (opt->u) ? info.st_atime : info.st_mtime;
+			}
 		}
 	}
 	closedir(dir);
@@ -116,7 +117,7 @@ void	print_list(char *d, t_opt *opt)
 	(!S_ISDIR(i.st_mode) || opt->d) ? list = ft_lstnew(d, ft_strlen(d)) : 0;
 	if (S_ISDIR(i.st_mode) && !(list = read_dir(d, opt)))
 	{
-		printf("ls: %s: Permission denied\n", d);
+		printf("ft_ls: %s: Permission denied\n", d);
 		return ;
 	}
 	(opt->l || opt->g) ? apply_l(list, d, opt) : 0;

@@ -29,6 +29,11 @@ void	print_dir(char *curr_dir, t_opt *opt)
 
 void	print_output(t_list *list, t_opt *opt)
 {
+	if (!list->next)
+	{
+		print_list(list->content, opt);
+		return ;
+	}
 	while (list)
 	{
 		print_list(list->content, opt);
@@ -41,6 +46,7 @@ void	print_output_dir(t_list *list, t_opt *opt, int flag)
 	int n;
 
 	n = 0;
+
 	(flag && !list->next) ? printf("%s:\n", list->content) : 0;
 	if (!list->next)
 	{
@@ -63,24 +69,22 @@ void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
 	struct stat n;
 
 	list_set(&out);
+
 	while (i < ac)
 	{
 		stat(av[i], &n);
-		if (!S_ISDIR(n.st_mode) && !S_ISBLK(n.st_mode) && !S_ISCHR(n.st_mode)
-			&& !S_ISFIFO(n.st_mode) && !S_ISREG(n.st_mode) &&
-			!S_ISLNK(n.st_mode) && !S_ISSOCK(n.st_mode))
+		if (!n.st_atime)
 			list_add(&(out->notexist), av[i], ft_strlen(av[i]));
 		else if (!S_ISDIR(n.st_mode))
 			list_add(&(out->notdir), av[i], ft_strlen(av[i]));
 		else
 			list_add(&(out->dir), av[i], ft_strlen(av[i]));
 		i++;
-		n.st_mode = 0;
+		n.st_atime = 0;
 	}
 	flag = (!out->notexist && !out->notdir && out->dir) ? 0 : 1;
-	flag = (!out->notdir && !out->dir && out->notexist) ? 1 : 0;
-	print_output(sort_dir(out->notexist, opt), opt);
-	print_output(sort_dir(out->notdir, opt), opt);
-	print_output_dir(sort_dir(out->dir, opt), opt, flag);
+	(out->notexist) ? print_output(sort_dir(out->notexist, opt), opt) : 0;
+	(out->notdir) ? print_output(sort_dir(out->notdir, opt), opt) : 0;
+	(out->dir) ? print_output_dir(sort_dir(out->dir, opt), opt, flag) : 0;
 	free_out(out);
 }

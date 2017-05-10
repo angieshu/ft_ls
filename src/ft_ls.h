@@ -48,8 +48,8 @@ typedef struct	s_output
 }				t_output;
 
 t_list		*sort_dir(t_list *head, t_opt *opt);
-t_list		*sort_list(t_list *head, t_opt *opt);
-t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k);
+t_list		*sort_list(t_list *head, t_opt *opt, int flag);
+t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k,int flag);
 t_list		*listrev(t_list *list);
 
 int			list_add(t_list **head, char *name, size_t size);

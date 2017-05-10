@@ -12,7 +12,7 @@
 
 #include "ft_ls.h" 
 
-t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
+t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k, int flag)
 {
 	t_list tmp;
 	t_list *head;
@@ -22,9 +22,9 @@ t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
 	c = head;
 	while (a && b)
 	{
-		k = (opt->t == 2) ? -(a->content_size - b->content_size)
+		k = (flag) ? (b->content_size - a->content_size)
 		: ft_strcmp(a->content, b->content);
-		if ((k < 0 && opt->r != 1) || (k > 0 && opt->r == 1))
+		if ((k < 0 && !opt->r) || (k > 0 && opt->r))
 		{
 			c->next = a;
 			c = a;
@@ -41,7 +41,7 @@ t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
 	return (head->next);
 }
 
-t_list		*sort_list(t_list *head, t_opt *opt)
+t_list		*sort_list(t_list *head, t_opt *opt, int flag)
 {
 	t_list *a;
 	t_list *b;
@@ -57,19 +57,20 @@ t_list		*sort_list(t_list *head, t_opt *opt)
 	}
 	b = head->next;
 	head->next = 0;
-	return (merge_list(sort_dir(a, opt), sort_dir(b, opt), opt, 0));
+	return (merge_list(sort_dir(a, opt), sort_dir(b, opt), opt, 0, flag));
 }
 
 t_list		*sort_dir(t_list *head, t_opt *opt)
 {
 	t_list *list;
+	// int flag;
 
-	list = sort_list(head, opt);
-	if (opt->t == 1)
-	{
-		opt->t = 2;
-		return (sort_list(head, opt));
-	}
+	if (!opt->t)
+		return (sort_list(head, opt, 0));
+	list = sort_list(head, opt, 1);
+	list = sort_list(list, opt, 0);
+	list = sort_list(list, opt, 1);
+	// list = sort_list(list, opt, 1);
 	return (list);
 }
 
