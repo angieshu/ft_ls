@@ -32,6 +32,8 @@ void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 		list = list->next;
 		original = original->next; 
 	}
+	free_list(&list);
+	free_list(&original);
 }
 
 void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)

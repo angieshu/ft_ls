@@ -1,7 +1,7 @@
 #ifndef FT_LS_H
 # define FT_LS_H
-# include "../libft/libft.h"
-// # include "libftprintf.h"
+# include "../includes/libft/libft.h"
+# include "../includes/ft_printf/src/libftprintf.h"
 # include <dirent.h>
 # include <sys/stat.h>
 # include <sys/dir.h>

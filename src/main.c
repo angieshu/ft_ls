@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ashulha <ashulha@student.us.org>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/09 15:54:00 by ashulha           #+#    #+#             */
+/*   Updated: 2017/05/09 15:54:03 by ashulha          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #include "ft_ls.h" 
 
@@ -113,7 +125,7 @@ void	print_list(char *d, t_opt *opt)
 		list = list->next;
 	}
 	(list) ? free_list(&list) : 0;
-	(opt->rr == 1) ? print_dir(d, opt) : 0;
+	(opt->rr) ? print_dir(d, opt) : 0;
 }
 
 
@@ -124,11 +136,15 @@ int		main(int ac, char **av)
 
 	i = 1;
 	opt_reset(&opt);
-	if (ac > 1 && av[1][0] == '-')
+	while (av[i][0] == '-')
 	{
-		if (!option(av[1], &opt))
+		if (!option(av[i], &opt))
 			return (0);
 		i++;
 	}
+		printf("======here=======\n");
+
 	(i == ac) ? print_list(".", &opt) : check_dir(av, i, ac, &opt, 0);
+	return (0);
 }
+
