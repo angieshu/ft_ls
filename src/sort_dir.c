@@ -63,15 +63,13 @@ t_list		*sort_list(t_list *head, t_opt *opt, int flag)
 t_list		*sort_dir(t_list *head, t_opt *opt)
 {
 	t_list *list;
-	// int flag;
+	t_list *list_1;
 
 	if (!opt->t)
 		return (sort_list(head, opt, 0));
 	list = sort_list(head, opt, 1);
-	list = sort_list(list, opt, 0);
-	list = sort_list(list, opt, 1);
-	// list = sort_list(list, opt, 1);
-	return (list);
+	list_1 = sort_list(list, opt, 0);
+	return (list_1);
 }
 
 t_list	*listrev(t_list *list)
