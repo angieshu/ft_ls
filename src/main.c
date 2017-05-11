@@ -115,11 +115,10 @@ void	print_list(char *d, t_opt *opt)
 		return ;
 	}
 	(!S_ISDIR(i.st_mode) || opt->d) ? list = ft_lstnew(d, ft_strlen(d)) : 0;
+	(S_ISDIR(i.st_mode) && !(i.st_mode & S_IRUSR)) ?
+	printf("ft_ls: %s: Permission denied\n", d) : 0;
 	if (S_ISDIR(i.st_mode) && !(list = read_dir(d, opt)))
-	{
-		printf("ft_ls: %s: Permission denied\n", d);
 		return ;
-	}
 	(opt->l || opt->g) ? apply_l(list, d, opt) : 0;
 	while (list && !opt->l && !opt->g)
 	{
