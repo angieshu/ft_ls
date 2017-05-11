@@ -19,14 +19,14 @@ void	permitions(char *perm, int len)
 	i = 4;
 	while (--i > 0)
 	{
-		(perm[len - i] == '0') ? printf("---") : 0; 
-		(perm[len - i] == '1') ? printf("--x") : 0; 
-		(perm[len - i] == '2') ? printf("-w-") : 0; 
-		(perm[len - i] == '3') ? printf("-wx") : 0; 
-		(perm[len - i] == '4') ? printf("r--") : 0; 
-		(perm[len - i] == '5') ? printf("r-x") : 0; 
-		(perm[len - i] == '6') ? printf("rw-") : 0; 
-		(perm[len - i] == '7') ? printf("rwx") : 0; 
+		(perm[len - i] == '0') ? ft_printf("---") : 0; 
+		(perm[len - i] == '1') ? ft_printf("--x") : 0; 
+		(perm[len - i] == '2') ? ft_printf("-w-") : 0; 
+		(perm[len - i] == '3') ? ft_printf("-wx") : 0; 
+		(perm[len - i] == '4') ? ft_printf("r--") : 0; 
+		(perm[len - i] == '5') ? ft_printf("r-x") : 0; 
+		(perm[len - i] == '6') ? ft_printf("rw-") : 0; 
+		(perm[len - i] == '7') ? ft_printf("rwx") : 0; 
 	}
 	free(perm);
 }
@@ -45,24 +45,24 @@ void	attrib(char *file)
     }
     xattr = listxattr(file, NULL, 0, XATTR_NOFOLLOW);
     if (xattr > 0)
-        printf("@ ");
+        ft_printf("@ ");
     else if (acl != NULL)
-        printf("+ ");
+        ft_printf("+ ");
     else
-        printf("  ");
+        ft_printf("  ");
 }
 
 void	mode(mode_t st_mode, char *file, int st_nlink, int len)
 {
 	char *perm;
 
-	(S_ISREG(st_mode)) ? printf("-") : 0;
-	(S_ISDIR(st_mode)) ? printf("d") : 0;
-	(S_ISBLK(st_mode)) ? printf("b") : 0;
-	(S_ISCHR(st_mode)) ? printf("c") : 0;
-	(S_ISLNK(st_mode)) ? printf("l") : 0;
-	(S_ISSOCK(st_mode)) ? printf("s") : 0;
-	(S_ISFIFO(st_mode)) ? printf("p") : 0;
+	(S_ISREG(st_mode)) ? ft_printf("-") : 0;
+	(S_ISDIR(st_mode)) ? ft_printf("d") : 0;
+	(S_ISBLK(st_mode)) ? ft_printf("b") : 0;
+	(S_ISCHR(st_mode)) ? ft_printf("c") : 0;
+	(S_ISLNK(st_mode)) ? ft_printf("l") : 0;
+	(S_ISSOCK(st_mode)) ? ft_printf("s") : 0;
+	(S_ISFIFO(st_mode)) ? ft_printf("p") : 0;
 	perm = ft_itoa_base(st_mode, 8);
 	permitions(perm, ft_strlen(perm));
 	attrib(file);
@@ -76,22 +76,22 @@ void	time_s(time_t tim, t_opt *opt, char *content)
 
 	time(&curr_time);
 	t = localtime(&tim);
-	(t->tm_mon == 0) ? printf("Jan %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 1) ? printf("Feb %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 2) ? printf("Mar %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 3) ? printf("Apr %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 4) ? printf("May %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 5) ? printf("Jun %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 6) ? printf("Jul %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 7) ? printf("Aug %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 8) ? printf("Sep %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 9) ? printf("Oct %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 10) ? printf("Nov %2d ", t->tm_mday) : 0;
-	(t->tm_mon == 11) ? printf("Dec %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 0) ? ft_printf("Jan %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 1) ? ft_printf("Feb %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 2) ? ft_printf("Mar %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 3) ? ft_printf("Apr %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 4) ? ft_printf("May %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 5) ? ft_printf("Jun %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 6) ? ft_printf("Jul %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 7) ? ft_printf("Aug %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 8) ? ft_printf("Sep %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 9) ? ft_printf("Oct %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 10) ? ft_printf("Nov %2d ", t->tm_mday) : 0;
+	(t->tm_mon == 11) ? ft_printf("Dec %2d ", t->tm_mday) : 0;
 	if (localtime(&curr_time)->tm_year < localtime(&tim)->tm_year)
-		(opt->tt) ? printf("    %d", t->tm_year) : printf(" %d\n", t->tm_year);
+		(opt->tt) ? ft_printf("    %d", t->tm_year) : ft_printf(" %d\n", t->tm_year);
 	else
-		printf("%02d:%02d", t->tm_hour, t->tm_min);
-	(opt->tt) ? printf(":%02d", t->tm_sec) : 0;
-	printf(" %s", content);
+		ft_printf("%02d:%02d", t->tm_hour, t->tm_min);
+	(opt->tt) ? ft_printf(":%02d", t->tm_sec) : 0;
+	ft_printf(" %s", content);
 }

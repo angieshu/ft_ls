@@ -1,7 +1,7 @@
 #ifndef FT_LS_H
 # define FT_LS_H
 # include "../includes/libft/libft.h"
-// # include "../includes/ft_printf/src/libftprintf.h"
+# include "../includes/ft_printf/src/libftprintf.h"
 # include <dirent.h>
 # include <sys/stat.h>
 # include <sys/dir.h>
@@ -47,17 +47,19 @@ typedef struct	s_output
 	t_list *dir;
 }				t_output;
 
-t_list		*sort_dir(t_list *head, t_opt *opt);
+t_list		*sort_dir(char *d, t_list *head, t_opt *opt);
 t_list		*sort_list(t_list *head, t_opt *opt);
 t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k);
 t_list		*listrev(t_list *list);
-t_list	*sort_t(t_list *head);
+t_list		*merge_list_t_mod(char *d, t_list *a, t_list *b, intmax_t k,
+																struct stat *ia);
+t_list		*merge_list_t_acc(char *d, t_list *a, t_list *b, intmax_t k,
+																struct stat *ia);
+t_list		*sort_t(char *d, t_list *head, t_opt *opt);
 
 
 int			list_add(t_list **head, char *name, size_t size);
 void		list_add_back(t_list *head, char *name, size_t size);
-
-char		*path(char *path_name, char *curr_dir, char *file_name);
 
 void		opt_set(t_len *l);
 void		min_width(t_list *list, t_list *original, t_opt *opt, t_len *l);

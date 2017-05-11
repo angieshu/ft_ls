@@ -23,8 +23,8 @@ int		option(char **s, t_opt *opt)
 		if (**s != 'l' && **s != 'R' && **s != 'a' && **s != 'r' && **s != 't'
 			&& **s != 'T' && **s != 'f' && **s != 'u' && **s != 'g' && **s != 'd')
 		{
-			printf("ft_ls: illegal option -- %c\n", **s);
-			printf("usage: ft_ls [-RTadfglrtu] [file ...]\n");
+			ft_printf("ft_ls: illegal option -- %c\n", **s);
+			ft_printf("usage: ft_ls [-RTadfglrtu] [file ...]\n");
 			return (0);	
 		}
 		opt->l = (**s == 'l') ? 1 : opt->l;
@@ -70,7 +70,7 @@ t_list	*read_dir(char *d, t_opt *opt)
 	if (opt->f)
 		return (listrev(dir_list));
 	closedir(dir);
-	return (sort_dir(dir_list, opt));
+	return (sort_dir(d, dir_list, opt));
 }
 
 t_list	*view_dir(char *d, t_opt *opt)
@@ -98,7 +98,7 @@ t_list	*view_dir(char *d, t_opt *opt)
 		}
 	}
 	closedir(dir);
-	return (sort_dir(list, opt));
+	return (sort_dir(d, list, opt));
 }
 
 void	print_list(char *d, t_opt *opt)
@@ -111,18 +111,19 @@ void	print_list(char *d, t_opt *opt)
 		&& !S_ISFIFO(i.st_mode) && !S_ISREG(i.st_mode) &&
 		!S_ISLNK(i.st_mode) && !S_ISSOCK(i.st_mode))
 	{
-		printf("ft_ls: %s: No such file or directory\n", d);
+		ft_printf("ft_ls: %s: No such file or directory\n", d);
 		return ;
 	}
 	(!S_ISDIR(i.st_mode) || opt->d) ? list = ft_lstnew(d, ft_strlen(d)) : 0;
-	(S_ISDIR(i.st_mode) && !(i.st_mode & S_IRUSR)) ?
-	printf("ft_ls: %s: Permission denied\n", d) : 0;
 	if (S_ISDIR(i.st_mode) && !(list = read_dir(d, opt)))
+	{
+		ft_printf("ft_ls: %s: Permission denied\n", d);
 		return ;
+	}
 	(opt->l || opt->g) ? apply_l(list, d, opt) : 0;
 	while (list && !opt->l && !opt->g)
 	{
-		printf("%s\n", list->content);
+		ft_printf("%s\n", list->content);
 		list = list->next;
 	}
 	(list) ? free_list(&list) : 0;

@@ -59,17 +59,15 @@ t_list		*sort_list(t_list *head, t_opt *opt)
 	return (merge_list(sort_list(a, opt), sort_list(b, opt), opt, 0));
 }
 
-t_list		*sort_dir(t_list *head, t_opt *opt)
+t_list		*sort_dir(char *d, t_list *head, t_opt *opt)
 {
 	t_list *list;
 
 	if (!opt->t)
 		return (sort_list(head, opt));
-	list = sort_t(head);
+	list = sort_t(d, head, opt);
 	if (opt->r)
 		return (listrev(list));
-	// list = sort_list(head, opt, 1);
-	// list_1 = sort_list(list, opt, 0);
 	return (list);
 }
 

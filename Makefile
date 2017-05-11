@@ -20,7 +20,11 @@ GCCFLAG =		gcc -Wall -Wextra -Werror
 
 SRCS =			src
 
-INCL =			src/ft_ls.h
+INCL =			src/ft_ls
+
+PF_LIB =		$(addprefix $(PRINT_DIR)/, libftprintf.a)
+
+FT_LIB =		$(addprefix $(LIBFT_DIR)/, libft.a)
 
 
 all: $(NAME)
@@ -28,7 +32,7 @@ all: $(NAME)
 $(NAME):
 	@make -C $(LIBFT_DIR) re
 	@make -C $(PRINT_DIR) re
-	@$(GCCFLAG) -L $(LIBFT_DIR) -lft -L $(PRINT_DIR) $(SRCS)/*.c -lft -I $(INCL) -o $(NAME)
+	@$(GCCFLAG) $(PF_LIB) $(FT_LIB) $(SRCS)/*.c -I $(INCL) -o $(NAME)
 
 clean:
 	@make -C $(LIBFT_DIR) clean

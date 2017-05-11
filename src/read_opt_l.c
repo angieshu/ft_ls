@@ -27,8 +27,8 @@ void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 		time_s((opt->u) ? i.st_atime : i.st_mtime, opt, original->content);
 		if (S_ISLNK(i.st_mode))
 			(readlink(list->content, lnk_s, PATH_MAX) != 1) ?
-			printf(" -> %s", lnk_s) : printf(" -> (invalid symbolic link!)");
-		printf("\n");
+			ft_printf(" -> %s", lnk_s) : ft_printf(" -> (invalid symbolic link!)");
+		ft_printf("\n");
 		list = list->next;
 		original = original->next; 
 	}
@@ -61,7 +61,7 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 		list = list->next;
 		l->total += i.st_blocks;
 	}
-	printf("total %d\n", l->total);
+	ft_printf("total %d\n", l->total);
 	apply_opt(tmp, original, opt, *l);
 }
 

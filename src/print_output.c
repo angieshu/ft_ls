@@ -20,11 +20,10 @@ void	print_dir(char *curr_dir, t_opt *opt)
 		return ;
 	while (list)
 	{
-		printf("\n%s:\n", list->content);
+		ft_printf("\n%s:\n", list->content);
 		print_list(list->content, opt);
 		list = list->next;
 	}
-	// free(list);
 }
 
 void	print_output(t_list *list, t_opt *opt)
@@ -47,7 +46,7 @@ void	print_output_dir(t_list *list, t_opt *opt, int flag)
 
 	n = 0;
 
-	(flag && !list->next) ? printf("%s:\n", list->content) : 0;
+	(flag && !list->next) ? ft_printf("%s:\n", list->content) : 0;
 	if (!list->next)
 	{
 		print_list(list->content, opt);
@@ -55,12 +54,22 @@ void	print_output_dir(t_list *list, t_opt *opt, int flag)
 	}
 	while (list)
 	{
-		(n == 0) ? 0 : printf("\n");
-		printf("%s:\n", list->content);
+		(n == 0) ? 0 : ft_printf("\n");
+		ft_printf("%s:\n", list->content);
 		print_list(list->content, opt);
 		list = list->next;
 		n++;
 	}
+}
+
+int		last_check(char *name)
+{
+	if (!ft_strncmp("", name, PATH_MAX))
+	{
+		ft_printf("ft_ls: fts_open: No such file or directory\n");
+		return (0);
+	}
+	return (1);
 }
 
 void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
@@ -69,10 +78,12 @@ void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
 	struct stat n;
 
 	list_set(&out);
-
 	while (i < ac)
 	{
 		stat(av[i], &n);
+		(!last_check(av[i])) ? free_out(out) : 0;
+		if (!last_check(av[i]))
+			return ;
 		if (!n.st_atime)
 			list_add(&(out->notexist), av[i], ft_strlen(av[i]));
 		else if (!S_ISDIR(n.st_mode))
@@ -83,8 +94,8 @@ void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
 		n.st_atime = 0;
 	}
 	flag = (!out->notexist && !out->notdir && out->dir) ? 0 : 1;
-	(out->notexist) ? print_output(sort_dir(out->notexist, opt), opt) : 0;
-	(out->notdir) ? print_output(sort_dir(out->notdir, opt), opt) : 0;
-	(out->dir) ? print_output_dir(sort_dir(out->dir, opt), opt, flag) : 0;
+	(out->notexist) ? print_output(sort_dir(".", out->notexist, opt), opt) : 0;
+	(out->notdir) ? print_output(sort_dir(".", out->notdir, opt), opt) : 0;
+	(out->dir) ? print_output_dir(sort_dir(".", out->dir, opt), opt, flag) : 0;
 	free_out(out);
 }
