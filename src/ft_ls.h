@@ -11,10 +11,10 @@
 # include <uuid/uuid.h>
 # include <sys/xattr.h>
 # include <grp.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <errno.h>
 # include <time.h>
+# include <sys/ioctl.h>
 
 typedef struct	s_opt
 {
@@ -47,6 +47,16 @@ typedef struct	s_output
 	t_list *dir;
 }				t_output;
 
+typedef struct	s_col
+{
+	int w_len;
+	int f_len;
+	int col_max;
+	int col;
+	int row;
+	int n_files;
+}				t_col;
+
 t_list		*sort_dir(char *d, t_list *head, t_opt *opt);
 t_list		*sort_list(t_list *head, t_opt *opt);
 t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k);
@@ -56,6 +66,7 @@ t_list		*merge_list_t_mod(char *d, t_list *a, t_list *b, intmax_t k,
 t_list		*merge_list_t_acc(char *d, t_list *a, t_list *b, intmax_t k,
 																struct stat *ia);
 t_list		*sort_t(char *d, t_list *head, t_opt *opt);
+char		*get_elem_n(t_list *list, int elem_n);
 
 
 int			list_add(t_list **head, char *name, size_t size);
@@ -89,6 +100,8 @@ void		print_list(char *d, t_opt *opt);
 t_list		*view_dir(char *d, t_opt *opt);
 t_list		*read_dir(char *d, t_opt *opt);
 int			option(char **s, t_opt *opt);
+
+void		columns(t_list *list);
 
 void		free_list(t_list **list);
 void		free_out(t_output *out);

@@ -115,17 +115,12 @@ void	print_list(char *d, t_opt *opt)
 		return ;
 	}
 	(!S_ISDIR(i.st_mode) || opt->d) ? list = ft_lstnew(d, ft_strlen(d)) : 0;
+	(S_ISDIR(i.st_mode) && !(i.st_mode & S_IRUSR)) ?
+	ft_printf("ft_ls: %s: Permission denied\n", d) : 0;
 	if (S_ISDIR(i.st_mode) && !(list = read_dir(d, opt)))
-	{
-		ft_printf("ft_ls: %s: Permission denied\n", d);
 		return ;
-	}
 	(opt->l || opt->g) ? apply_l(list, d, opt) : 0;
-	while (list && !opt->l && !opt->g)
-	{
-		ft_printf("%s\n", list->content);
-		list = list->next;
-	}
+	(!opt->l && !opt->g) ? columns(list) : 0;
 	(list) ? free_list(&list) : 0;
 	(opt->rr) ? print_dir(d, opt) : 0;
 }

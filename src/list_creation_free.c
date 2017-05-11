@@ -36,6 +36,15 @@ void	list_add_back(t_list *head, char *name, size_t size)
 		head->next = tmp;
 }
 
+char	*get_elem_n(t_list *list, int elem_n)
+{
+	while (list && elem_n-- > 0)
+		list = list->next;
+	if (!list || elem_n > 0)
+		return (NULL);
+	return (list->content);
+}
+
 void	free_list(t_list **list)
 {
 	t_list *tmp;
