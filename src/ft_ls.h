@@ -80,8 +80,8 @@ t_list			*sort_dir(char *d, t_list *head, t_opt *opt);
 t_list			*sort_list(t_list *head, t_opt *opt);
 t_list			*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k);
 t_list			*listrev(t_list *list);
-t_list			*merge_list_t_mod(char *d, t_list *a, t_list *b);
-t_list			*merge_list_t_acc(char *d, t_list *a, t_list *b);
+t_list			*merge_list_t_mod(char *d, t_list *a, t_list *b, t_stat s);
+t_list			*merge_list_t_acc(char *d, t_list *a, t_list *b, t_stat s);
 t_list			*sort_t(char *d, t_list *head, t_opt *opt);
 char			*get_elem_n(t_list *list, int elem_n);
 

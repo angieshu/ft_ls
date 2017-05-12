@@ -12,12 +12,11 @@
 
 #include "ft_ls.h"
 
-t_list	*merge_list_t_mod(char *d, t_list *a, t_list *b)
+t_list	*merge_list_t_mod(char *d, t_list *a, t_list *b, t_stat s)
 {
 	t_list		tmp;
 	t_list		*head;
 	t_list		*c;
-	t_stat		s;
 	char		path_name[PATH_MAX + 1];
 
 	head = &tmp;
@@ -41,12 +40,11 @@ t_list	*merge_list_t_mod(char *d, t_list *a, t_list *b)
 	return (head->next);
 }
 
-t_list	*merge_list_t_acc(char *d, t_list *a, t_list *b)
+t_list	*merge_list_t_acc(char *d, t_list *a, t_list *b, t_stat s)
 {
 	t_list		tmp;
 	t_list		*head;
 	t_list		*c;
-	t_stat		s;
 	char		path_name[PATH_MAX + 1];
 
 	head = &tmp;
@@ -74,6 +72,7 @@ t_list	*sort_t(char *d, t_list *head, t_opt *opt)
 {
 	t_list *a;
 	t_list *b;
+	t_stat	s;
 
 	if (!head || !head->next)
 		return (head);
@@ -86,7 +85,8 @@ t_list	*sort_t(char *d, t_list *head, t_opt *opt)
 	}
 	b = head->next;
 	head->next = 0;
+	s = *(t_stat*)ft_memalloc(sizeof(t_stat));
 	return (opt->u) ?
-	(merge_list_t_acc(d, sort_t(d, a, opt), sort_t(d, b, opt)))
-	: (merge_list_t_mod(d, sort_t(d, a, opt), sort_t(d, b, opt)));
+	(merge_list_t_acc(d, sort_t(d, a, opt), sort_t(d, b, opt), s))
+	: (merge_list_t_mod(d, sort_t(d, a, opt), sort_t(d, b, opt), s));
 }
