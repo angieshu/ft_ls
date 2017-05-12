@@ -14,8 +14,8 @@
 
 void	link_l(int st_nlink, int len)
 {
-	int diff;
-	char *tmp;
+	int		diff;
+	char	*tmp;
 
 	tmp = ft_itoa_base(st_nlink, 10);
 	diff = len - ft_strlen(tmp);
@@ -37,8 +37,8 @@ void	user_id(uid_t user, int len)
 
 void	size_l(intmax_t size, int len)
 {
-	int diff;
-	char *tmp;
+	int		diff;
+	char	*tmp;
 
 	tmp = ft_itoa_base(size, 10);
 	diff = len - ft_strlen(tmp);

@@ -19,37 +19,38 @@ void	permitions(char *perm, int len)
 	i = 4;
 	while (--i > 0)
 	{
-		(perm[len - i] == '0') ? ft_printf("---") : 0; 
-		(perm[len - i] == '1') ? ft_printf("--x") : 0; 
-		(perm[len - i] == '2') ? ft_printf("-w-") : 0; 
-		(perm[len - i] == '3') ? ft_printf("-wx") : 0; 
-		(perm[len - i] == '4') ? ft_printf("r--") : 0; 
-		(perm[len - i] == '5') ? ft_printf("r-x") : 0; 
-		(perm[len - i] == '6') ? ft_printf("rw-") : 0; 
-		(perm[len - i] == '7') ? ft_printf("rwx") : 0; 
+		(perm[len - i] == '0') ? ft_printf("---") : 0;
+		(perm[len - i] == '1') ? ft_printf("--x") : 0;
+		(perm[len - i] == '2') ? ft_printf("-w-") : 0;
+		(perm[len - i] == '3') ? ft_printf("-wx") : 0;
+		(perm[len - i] == '4') ? ft_printf("r--") : 0;
+		(perm[len - i] == '5') ? ft_printf("r-x") : 0;
+		(perm[len - i] == '6') ? ft_printf("rw-") : 0;
+		(perm[len - i] == '7') ? ft_printf("rwx") : 0;
 	}
 	free(perm);
 }
 
 void	attrib(char *file)
 {
-	acl_t acl;
-    acl_entry_t entry;
-    ssize_t xattr = 0;
+	acl_entry_t	entry;
+	acl_t		acl;
+	ssize_t		xattr;
 
-    acl = acl_get_link_np(file, ACL_TYPE_EXTENDED);
-    if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
-    {
-        acl_free(acl);
-        acl = NULL;
-    }
-    xattr = listxattr(file, NULL, 0, XATTR_NOFOLLOW);
-    if (xattr > 0)
-        ft_printf("@ ");
-    else if (acl != NULL)
-        ft_printf("+ ");
-    else
-        ft_printf("  ");
+	xattr = 0;
+	acl = acl_get_link_np(file, ACL_TYPE_EXTENDED);
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry) == -1)
+	{
+		acl_free(acl);
+		acl = NULL;
+	}
+	xattr = listxattr(file, NULL, 0, XATTR_NOFOLLOW);
+	if (xattr > 0)
+		ft_printf("@ ");
+	else if (acl != NULL)
+		ft_printf("+ ");
+	else
+		ft_printf("  ");
 }
 
 void	mode(mode_t st_mode, char *file, int st_nlink, int len)
@@ -71,8 +72,8 @@ void	mode(mode_t st_mode, char *file, int st_nlink, int len)
 
 void	time_s(time_t tim, t_opt *opt, char *content)
 {
-	time_t curr_time;
-	struct tm *t;
+	time_t		curr_time;
+	struct tm	*t;
 
 	time(&curr_time);
 	t = localtime(&tim);
@@ -89,7 +90,8 @@ void	time_s(time_t tim, t_opt *opt, char *content)
 	(t->tm_mon == 10) ? ft_printf("Nov %2d ", t->tm_mday) : 0;
 	(t->tm_mon == 11) ? ft_printf("Dec %2d ", t->tm_mday) : 0;
 	if (localtime(&curr_time)->tm_year < localtime(&tim)->tm_year)
-		(opt->tt) ? ft_printf("    %d", t->tm_year) : ft_printf(" %d\n", t->tm_year);
+		(opt->tt) ? ft_printf("    %d", t->tm_year) :
+		ft_printf(" %d\n", t->tm_year);
 	else
 		ft_printf("%02d:%02d", t->tm_hour, t->tm_min);
 	(opt->tt) ? ft_printf(":%02d", t->tm_sec) : 0;

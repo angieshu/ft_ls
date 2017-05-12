@@ -45,7 +45,6 @@ void	print_output_dir(t_list *list, t_opt *opt, int flag)
 	int n;
 
 	n = 0;
-
 	(flag && !list->next) ? ft_printf("%s:\n", list->content) : 0;
 	if (!list->next)
 	{
@@ -72,10 +71,11 @@ int		last_check(char *name)
 	return (1);
 }
 
-void	check_dir(char **av, int i, int ac, t_opt *opt, int flag)
+void	check_dir(char **av, int i, int ac, t_opt *opt)
 {
-	t_output *out;
-	struct stat n;
+	t_output	*out;
+	struct stat	n;
+	int			flag;
 
 	list_set(&out);
 	while (i < ac)

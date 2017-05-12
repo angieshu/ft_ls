@@ -14,8 +14,8 @@
 
 void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 {
-	struct stat i;
-	char lnk_s[PATH_MAX + 1];
+	struct stat	i;
+	char		lnk_s[PATH_MAX + 1];
 
 	while (list)
 	{
@@ -27,10 +27,11 @@ void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 		time_s((opt->u) ? i.st_atime : i.st_mtime, opt, original->content);
 		if (S_ISLNK(i.st_mode))
 			(readlink(list->content, lnk_s, PATH_MAX) != 1) ?
-			ft_printf(" -> %s", lnk_s) : ft_printf(" -> (invalid symbolic link!)");
+			ft_printf(" -> %s", lnk_s) :
+			ft_printf(" -> (invalid symbolic link!)");
 		ft_printf("\n");
 		list = list->next;
-		original = original->next; 
+		original = original->next;
 	}
 	free_list(&list);
 	free_list(&original);
@@ -38,8 +39,8 @@ void	apply_opt(t_list *list, t_list *original, t_opt *opt, t_len l)
 
 void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 {
-	t_list *tmp;
-	struct stat i;
+	t_list		*tmp;
+	struct stat	i;
 
 	if (!list->next)
 	{
@@ -57,7 +58,7 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 		l->gr = (ft_strlen(getgrgid(i.st_gid)->gr_name) > l->gr) ?
 							ft_strlen(getgrgid(i.st_gid)->gr_name) : l->gr;
 		l->size = (ft_countnbr(i.st_size, 10) > l->size) ?
-										ft_countnbr(i.st_size, 10) :l->size;
+										ft_countnbr(i.st_size, 10) : l->size;
 		list = list->next;
 		l->total += i.st_blocks;
 	}
@@ -65,28 +66,28 @@ void	min_width(t_list *list, t_list *original, t_opt *opt, t_len *l)
 	apply_opt(tmp, original, opt, *l);
 }
 
-void	apply_l(t_list *dir_list, char *dir, t_opt *opt)
+void	apply_l(t_list *list, char *dir, t_opt *opt)
 {
-	char name[PATH_MAX + 1];
-	t_list *new_l;
-	t_list *tmp;
-	t_len l;
+	char	name[PATH_MAX + 1];
+	t_list	*new_l;
+	t_list	*tmp;
+	t_len	l;
 
 	opt_set(&l);
-	if (!dir_list->next)
+	if (!list->next)
 	{
-		min_width(dir_list, dir_list, opt, &l);
+		min_width(list, list, opt, &l);
 		return ;
 	}
-	tmp = dir_list;
-	path(name, dir, dir_list->content);
+	tmp = list;
+	path(name, dir, list->content);
 	new_l = ft_lstnew(name, ft_strlen(name));
-	dir_list = dir_list->next;
-	while (dir_list)
+	list = list->next;
+	while (list)
 	{
-		path(name, dir, dir_list->content);
+		path(name, dir, list->content);
 		list_add_back(new_l, name, ft_strlen(name));
-		dir_list = dir_list->next;
+		list = list->next;
 	}
 	min_width(new_l, tmp, opt, &l);
 }

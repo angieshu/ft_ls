@@ -99,6 +99,6 @@ char				*ft_itoa_exp(long double nbr, int k);
 char				*ft_itoa_double_g(long double nbr, int k);
 char				*ft_itoa_signed(intmax_t num);
 char				*ft_itoa_unsigned(uintmax_t num, int base);
-void    			ft_putnchar(char c, unsigned int n);
+void				ft_putnchar(char c, unsigned int n);
 
 #endif

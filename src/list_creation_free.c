@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ls.h" 
+#include "ft_ls.h"
 
 int		list_add(t_list **head, char *name, size_t size)
 {
@@ -32,7 +32,7 @@ void	list_add_back(t_list *head, char *name, size_t size)
 
 	while (head->next)
 		head = head->next;
-	if ((tmp = ft_lstnew(name,size)))
+	if ((tmp = ft_lstnew(name, size)))
 		head->next = tmp;
 }
 
@@ -55,7 +55,6 @@ void	free_list(t_list **list)
 		(tmp->content) ? free(tmp->content) : 0;
 		tmp = tmp->next;
 	}
-
 	(list) ? free(*list) : 0;
 }
 

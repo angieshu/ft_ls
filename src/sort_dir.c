@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ls.h" 
+#include "ft_ls.h"
 
-t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
+t_list	*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
 {
 	t_list tmp;
 	t_list *head;
@@ -40,7 +40,7 @@ t_list		*merge_list(t_list *a, t_list *b, t_opt *opt, intmax_t k)
 	return (head->next);
 }
 
-t_list		*sort_list(t_list *head, t_opt *opt)
+t_list	*sort_list(t_list *head, t_opt *opt)
 {
 	t_list *a;
 	t_list *b;
@@ -59,7 +59,7 @@ t_list		*sort_list(t_list *head, t_opt *opt)
 	return (merge_list(sort_list(a, opt), sort_list(b, opt), opt, 0));
 }
 
-t_list		*sort_dir(char *d, t_list *head, t_opt *opt)
+t_list	*sort_dir(char *d, t_list *head, t_opt *opt)
 {
 	t_list *list;
 
