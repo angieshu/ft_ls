@@ -12,57 +12,36 @@
 
 #include "ft_ls.h"
 
-t_list	*merge_list_t_mod(char *d, t_list *a, t_list *b, t_stat s)
+int		nano_sec(char *dir, char *content, t_opt *opt)
 {
-	t_list		tmp;
-	t_list		*head;
-	t_list		*c;
+	struct stat	s;
 	char		path_name[PATH_MAX + 1];
 
-	head = &tmp;
-	c = head;
-	while (a && b)
-	{
-		lstat(path(path_name, d, a->content), s.ia);
-		lstat(path(path_name, d, b->content), s.ib);
-		if (!(s.k = b->content_size - a->content_size))
-		{
-			if (!(s.k = s.ib->st_mtimespec.tv_nsec -
-							s.ia->st_mtimespec.tv_nsec))
-				s.k = ft_strcmp(a->content, b->content);
-		}
-		c->next = (s.k < 0) ? a : b;
-		c = (s.k < 0) ? a : b;
-		(s.k < 0) ? (a = a->next) : 0;
-		(s.k < 0) ? 0 : (b = b->next);
-	}
-	c->next = (a == 0) ? b : a;
-	return (head->next);
+	lstat(path(path_name, dir, content), &s);
+	return (opt->u) ? (s.st_atimespec.tv_nsec) : (s.st_mtimespec.tv_nsec);
 }
 
-t_list	*merge_list_t_acc(char *d, t_list *a, t_list *b, t_stat s)
+t_list	*merge_list_t(char *d, t_list *a, t_list *b, t_opt *opt)
 {
 	t_list		tmp;
 	t_list		*head;
 	t_list		*c;
-	char		path_name[PATH_MAX + 1];
+	int			k;
 
 	head = &tmp;
 	c = head;
 	while (a && b)
 	{
-		lstat(path(path_name, d, a->content), s.ia);
-		lstat(path(path_name, d, b->content), s.ib);
-		if (!(s.k = b->content_size - a->content_size))
+		if (!(k = b->content_size - a->content_size))
 		{
-			if (!(s.k = s.ib->st_atimespec.tv_nsec -
-							s.ia->st_atimespec.tv_nsec))
-				s.k = ft_strcmp(a->content, b->content);
+			if (!(k = nano_sec(d, b->content, opt) -
+							nano_sec(d, a->content, opt)))
+				k = ft_strcmp(a->content, b->content);
 		}
-		c->next = (s.k < 0) ? a : b;
-		c = (s.k < 0) ? a : b;
-		(s.k < 0) ? (a = a->next) : 0;
-		(s.k < 0) ? 0 : (b = b->next);
+		c->next = (k < 0) ? a : b;
+		c = (k < 0) ? a : b;
+		(k < 0) ? (a = a->next) : 0;
+		(k < 0) ? 0 : (b = b->next);
 	}
 	c->next = (a == 0) ? b : a;
 	return (head->next);
@@ -72,7 +51,6 @@ t_list	*sort_t(char *d, t_list *head, t_opt *opt)
 {
 	t_list *a;
 	t_list *b;
-	t_stat	s;
 
 	if (!head || !head->next)
 		return (head);
@@ -85,8 +63,5 @@ t_list	*sort_t(char *d, t_list *head, t_opt *opt)
 	}
 	b = head->next;
 	head->next = 0;
-	s = *(t_stat*)ft_memalloc(sizeof(t_stat));
-	return (opt->u) ?
-	(merge_list_t_acc(d, sort_t(d, a, opt), sort_t(d, b, opt), s))
-	: (merge_list_t_mod(d, sort_t(d, a, opt), sort_t(d, b, opt), s));
+	return (merge_list_t(d, sort_t(d, a, opt), sort_t(d, b, opt), opt));
 }
